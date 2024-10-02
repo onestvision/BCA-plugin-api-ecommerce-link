@@ -1,0 +1,38 @@
+{
+  "kind": "collectionType",
+  "collectionName": "encoders",
+  "info": {
+    "singularName": "encoder",
+    "pluralName": "encoders",
+    "displayName": "encoder"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "image": {
+      "allowedTypes": [
+        "images"
+      ],
+      "type": "media",
+      "multiple": false,
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "name",
+      "required": true
+    },
+    "products": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product.product",
+      "mappedBy": "encoder"
+    }
+  }
+}
