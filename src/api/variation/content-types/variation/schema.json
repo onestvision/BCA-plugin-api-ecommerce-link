@@ -1,0 +1,77 @@
+{
+  "kind": "collectionType",
+  "collectionName": "variations",
+  "info": {
+    "singularName": "variation",
+    "pluralName": "variations",
+    "displayName": "Variation",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "product": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::product.product",
+      "inversedBy": "variations"
+    },
+    "name": {
+      "type": "string",
+      "required": true,
+      "default": "Variaition Name"
+    },
+    "price": {
+      "type": "biginteger",
+      "default": "29900",
+      "required": true
+    },
+    "discount_price": {
+      "type": "biginteger",
+      "default": "25900"
+    },
+    "stock": {
+      "type": "biginteger",
+      "default": "30",
+      "required": true
+    },
+    "sku": {
+      "type": "uid",
+      "default": "0001-1",
+      "required": true
+    },
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "description": {
+      "type": "text",
+      "default": "descripcion",
+      "required": true
+    },
+    "attribute_values": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::attribute-value.attribute-value",
+      "inversedBy": "variations"
+    },
+    "attributes": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::attribute.attribute",
+      "inversedBy": "variations"
+    },
+    "global_config": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::global-config.global-config",
+      "inversedBy": "variations"
+    }
+  }
+}

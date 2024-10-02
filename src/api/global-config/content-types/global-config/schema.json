@@ -1,0 +1,90 @@
+{
+  "kind": "collectionType",
+  "collectionName": "global_configs",
+  "info": {
+    "singularName": "global-config",
+    "pluralName": "global-configs",
+    "displayName": "Client",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "primary_color": {
+      "type": "string",
+      "default": "#0ba4e4",
+      "required": false
+    },
+    "secondary_color": {
+      "type": "string",
+      "default": "#ffa500",
+      "required": true
+    },
+    "text_primary_color": {
+      "type": "string",
+      "default": "#000000",
+      "required": true
+    },
+    "text_secondary_color": {
+      "type": "string",
+      "default": "#808080",
+      "required": true
+    },
+    "background_primary_color": {
+      "type": "string",
+      "default": "#fffffd"
+    },
+    "background_secondary_color": {
+      "type": "string",
+      "default": "#f8f8f8",
+      "required": false
+    },
+    "background_tertiary_color": {
+      "type": "string",
+      "default": "#e6e6eb",
+      "required": true
+    },
+    "border_radius": {
+      "type": "enumeration",
+      "enum": [
+        "small",
+        "medium",
+        "large"
+      ]
+    },
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "client_name": {
+      "type": "string",
+      "default": "Client Name",
+      "required": true,
+      "unique": true
+    },
+    "categories": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::category.category",
+      "mappedBy": "global_config"
+    },
+    "products": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product.product",
+      "mappedBy": "global_config"
+    },
+    "variations": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::variation.variation",
+      "mappedBy": "global_config"
+    }
+  }
+}

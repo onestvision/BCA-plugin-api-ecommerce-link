@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "attributes",
+  "info": {
+    "singularName": "attribute",
+    "pluralName": "attributes",
+    "displayName": "Attribute",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "default": "color",
+      "required": true
+    },
+    "attribute_values": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::attribute-value.attribute-value"
+    },
+    "variations": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::variation.variation",
+      "mappedBy": "attributes"
+    }
+  }
+}
