@@ -11,25 +11,25 @@ module.exports = {
       const response = await axios.post(
         `${process.env.WOMPI_URL}/transaction`,
         {
-          amount_in_cents: data.amount * 100, // La cantidad debe estar en centavos
+          amount_in_cents: data.amount * 100,
           currency: 'COP',
           customer_email: data.email,
           payment_method: {
             type: 'CARD',
-            token: data.token, // Token generado en el frontend con la tarjeta
+            token: data.token,
           },
           reference: data.reference,
-          redirect_url: 'https://tu-sitio.com/confirmacion-pago', // URL de confirmación de pago
+          redirect_url: 'https://www.google.com/',
         },
         {
           headers: {
-            Authorization: `Bearer ${process.env.WOMPI_PRIVATE_KEY}`, // Tu Private Key
+            Authorization: `Bearer ${process.env.WOMPI_PRIVATE_KEY}`,
           },
         }
       );
       return response.data;
     } catch (error) {
-      throw new Error('Error al procesar el pago con Wompi', error);
+      throw new Error('Error al procesar el pago con Wompi');
     }
   },  
 };
