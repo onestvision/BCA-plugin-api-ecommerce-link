@@ -7,8 +7,8 @@ const CryptoJS = require('crypto-js');
 
 module.exports = {
   async encrypt(dataString) {
-    const key = CryptoJS.enc.Base64.parse('KHUKFEI42424HFAFHEHUHF');
-    const iv = CryptoJS.enc.Base64.parse('FEFEF45343MNNJNJ353555');
+    const key = CryptoJS.enc.Base64.parse(process.env.ENCRYPT_KEY);
+    const iv = CryptoJS.enc.Base64.parse(process.env.ENCRYPT_IV);
 
     const encrypted = CryptoJS.AES.encrypt(dataString, key, {
       iv: iv,

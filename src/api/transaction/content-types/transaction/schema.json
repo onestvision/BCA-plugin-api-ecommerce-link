@@ -1,0 +1,60 @@
+{
+  "kind": "collectionType",
+  "collectionName": "transactions",
+  "info": {
+    "singularName": "transaction",
+    "pluralName": "transactions",
+    "displayName": "Transaction",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "customer": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::customer.customer",
+      "inversedBy": "transactions"
+    },
+    "order": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::order.order",
+      "inversedBy": "transaction"
+    },
+    "transaction_date": {
+      "type": "datetime"
+    },
+    "payment_id": {
+      "type": "string"
+    },
+    "payment_method": {
+      "type": "string"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "Completed",
+        "Processing",
+        "Failed",
+        "Canceled"
+      ]
+    },
+    "taxes": {
+      "type": "decimal"
+    },
+    "subtotal": {
+      "type": "decimal"
+    },
+    "total": {
+      "type": "decimal"
+    },
+    "transaction_id": {
+      "type": "string",
+      "unique": true,
+      "required": true
+    }
+  }
+}
