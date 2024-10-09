@@ -47,6 +47,16 @@
       "type": "string",
       "unique": true,
       "required": false
+    },
+    "coupon": {
+      "type": "string",
+      "unique": true
+    },
+    "discount": {
+      "type": "decimal"
+    },
+    "total": {
+      "type": "decimal"
     }
   }
 }

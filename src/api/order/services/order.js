@@ -3,14 +3,16 @@ const { filter } = require('../../../../config/middlewares');
 const { createCoreService } = require('@strapi/strapi').factories;
 
 module.exports = createCoreService('api::order.order', ({strapi})=>({
-  async createOrder(userId, products) {
+  async createOrder(userId, products, discount, coupon, total) {
     try {  
       const orderId = `OR${Math.floor(100000 + Math.random() * 900000)}`;
       let orderDescription = "";
       let order = await strapi.entityService.create('api::order.order', {
         data: {
-          order_id: orderId,
-          user: userId
+          user: userId,
+          discount: discount,
+          coupon: coupon,
+          total: total
         },
       });      
 
@@ -45,6 +47,7 @@ module.exports = createCoreService('api::order.order', ({strapi})=>({
       order = await strapi.entityService.update('api::order.order', order.id,{
         data: {
           description: orderDescription,
+          order_id: `${orderId}${order.id}`,
         },
         populate: 'product_orders'
       });
