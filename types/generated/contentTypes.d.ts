@@ -1161,6 +1161,9 @@ export interface ApiOrderOrder extends Schema.CollectionType {
       'api::product-order.product-order'
     >;
     order_id: Attribute.String & Attribute.Unique;
+    coupon: Attribute.String & Attribute.Unique;
+    discount: Attribute.Decimal;
+    total: Attribute.Decimal;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
