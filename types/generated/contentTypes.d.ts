@@ -999,36 +999,50 @@ export interface ApiColectionColection extends Schema.CollectionType {
   };
 }
 
-export interface ApiEncoderEncoder extends Schema.CollectionType {
-  collectionName: 'encoders';
+export interface ApiCustomerCustomer extends Schema.CollectionType {
+  collectionName: 'customers';
   info: {
-    singularName: 'encoder';
-    pluralName: 'encoders';
-    displayName: 'encoder';
+    singularName: 'customer';
+    pluralName: 'customers';
+    displayName: 'Customer';
+    description: '';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
-    name: Attribute.String & Attribute.Required;
-    image: Attribute.Media<'images'> & Attribute.Required;
-    slug: Attribute.UID<'api::encoder.encoder', 'name'> & Attribute.Required;
-    products: Attribute.Relation<
-      'api::encoder.encoder',
+    name: Attribute.String;
+    last_name: Attribute.String;
+    identify_number: Attribute.String & Attribute.Required & Attribute.Unique;
+    identification_type: Attribute.String;
+    phone_number: Attribute.String & Attribute.Required & Attribute.Unique;
+    email: Attribute.Email;
+    city_code: Attribute.String;
+    department_code: Attribute.String;
+    country: Attribute.String;
+    address: Attribute.String;
+    company_name: Attribute.String;
+    orders: Attribute.Relation<
+      'api::customer.customer',
       'oneToMany',
-      'api::product.product'
+      'api::order.order'
+    >;
+    transactions: Attribute.Relation<
+      'api::customer.customer',
+      'oneToMany',
+      'api::transaction.transaction'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
-      'api::encoder.encoder',
+      'api::customer.customer',
       'oneToOne',
       'admin::user'
     > &
       Attribute.Private;
     updatedBy: Attribute.Relation<
-      'api::encoder.encoder',
+      'api::customer.customer',
       'oneToOne',
       'admin::user'
     > &
@@ -1103,6 +1117,56 @@ export interface ApiGlobalConfigGlobalConfig extends Schema.CollectionType {
   };
 }
 
+export interface ApiOrderOrder extends Schema.CollectionType {
+  collectionName: 'orders';
+  info: {
+    singularName: 'order';
+    pluralName: 'orders';
+    displayName: 'Order';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    description: Attribute.Text;
+    status: Attribute.Enumeration<
+      ['Completed', 'Processing', 'Failed', 'Canceled']
+    >;
+    customer: Attribute.Relation<
+      'api::order.order',
+      'manyToOne',
+      'api::customer.customer'
+    >;
+    transaction: Attribute.Relation<
+      'api::order.order',
+      'oneToOne',
+      'api::transaction.transaction'
+    >;
+    product_order: Attribute.Relation<
+      'api::order.order',
+      'oneToOne',
+      'api::product-order.product-order'
+    >;
+    order_id: Attribute.String & Attribute.Required & Attribute.Unique;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::order.order',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::order.order',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiProductProduct extends Schema.CollectionType {
   collectionName: 'products';
   info: {
@@ -1169,6 +1233,100 @@ export interface ApiProductProduct extends Schema.CollectionType {
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::product.product',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiProductOrderProductOrder extends Schema.CollectionType {
+  collectionName: 'product_orders';
+  info: {
+    singularName: 'product-order';
+    pluralName: 'product-orders';
+    displayName: 'Product_order';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    products: Attribute.Relation<
+      'api::product-order.product-order',
+      'oneToMany',
+      'api::product.product'
+    >;
+    order: Attribute.Relation<
+      'api::product-order.product-order',
+      'oneToOne',
+      'api::order.order'
+    >;
+    amount: Attribute.Integer;
+    unit_price: Attribute.Decimal;
+    currency: Attribute.String;
+    subtotal: Attribute.Decimal;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::product-order.product-order',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::product-order.product-order',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiTransactionTransaction extends Schema.CollectionType {
+  collectionName: 'transactions';
+  info: {
+    singularName: 'transaction';
+    pluralName: 'transactions';
+    displayName: 'Transaction';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    customer: Attribute.Relation<
+      'api::transaction.transaction',
+      'manyToOne',
+      'api::customer.customer'
+    >;
+    order: Attribute.Relation<
+      'api::transaction.transaction',
+      'oneToOne',
+      'api::order.order'
+    >;
+    transaction_date: Attribute.DateTime;
+    payment_id: Attribute.String;
+    payment_method: Attribute.String;
+    status: Attribute.Enumeration<
+      ['Completed', 'Processing', 'Failed', 'Canceled']
+    >;
+    taxes: Attribute.Decimal;
+    subtotal: Attribute.Decimal;
+    total: Attribute.Decimal;
+    transaction_id: Attribute.String & Attribute.Required & Attribute.Unique;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::transaction.transaction',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::transaction.transaction',
       'oneToOne',
       'admin::user'
     > &
@@ -1264,9 +1422,12 @@ declare module '@strapi/types' {
       'api::brand.brand': ApiBrandBrand;
       'api::category.category': ApiCategoryCategory;
       'api::colection.colection': ApiColectionColection;
-      'api::encoder.encoder': ApiEncoderEncoder;
+      'api::customer.customer': ApiCustomerCustomer;
       'api::global-config.global-config': ApiGlobalConfigGlobalConfig;
+      'api::order.order': ApiOrderOrder;
       'api::product.product': ApiProductProduct;
+      'api::product-order.product-order': ApiProductOrderProductOrder;
+      'api::transaction.transaction': ApiTransactionTransaction;
       'api::variation.variation': ApiVariationVariation;
     }
   }
