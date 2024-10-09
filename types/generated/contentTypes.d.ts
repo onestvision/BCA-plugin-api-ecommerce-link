@@ -742,7 +742,6 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
   };
   options: {
     draftAndPublish: false;
-    timestamps: true;
   };
   attributes: {
     username: Attribute.String &
@@ -771,6 +770,18 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.role'
     >;
+    orders: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::order.order'
+    >;
+    customers: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::customer.customer'
+    >;
+    name: Attribute.String;
+    phone_number: Attribute.String & Attribute.Required & Attribute.Unique;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1022,15 +1033,15 @@ export interface ApiCustomerCustomer extends Schema.CollectionType {
     country: Attribute.String;
     address: Attribute.String;
     company_name: Attribute.String;
-    orders: Attribute.Relation<
-      'api::customer.customer',
-      'oneToMany',
-      'api::order.order'
-    >;
     transactions: Attribute.Relation<
       'api::customer.customer',
       'oneToMany',
       'api::transaction.transaction'
+    >;
+    user: Attribute.Relation<
+      'api::customer.customer',
+      'manyToOne',
+      'plugin::users-permissions.user'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -1132,23 +1143,24 @@ export interface ApiOrderOrder extends Schema.CollectionType {
     description: Attribute.Text;
     status: Attribute.Enumeration<
       ['Completed', 'Processing', 'Failed', 'Canceled']
-    >;
-    customer: Attribute.Relation<
+    > &
+      Attribute.DefaultTo<'Processing'>;
+    user: Attribute.Relation<
       'api::order.order',
       'manyToOne',
-      'api::customer.customer'
+      'plugin::users-permissions.user'
     >;
     transaction: Attribute.Relation<
       'api::order.order',
       'oneToOne',
       'api::transaction.transaction'
     >;
-    product_order: Attribute.Relation<
+    product_orders: Attribute.Relation<
       'api::order.order',
-      'oneToOne',
+      'oneToMany',
       'api::product-order.product-order'
     >;
-    order_id: Attribute.String & Attribute.Required & Attribute.Unique;
+    order_id: Attribute.String & Attribute.Unique;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1252,20 +1264,25 @@ export interface ApiProductOrderProductOrder extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    products: Attribute.Relation<
-      'api::product-order.product-order',
-      'oneToMany',
-      'api::product.product'
-    >;
-    order: Attribute.Relation<
+    product: Attribute.Relation<
       'api::product-order.product-order',
       'oneToOne',
-      'api::order.order'
+      'api::product.product'
     >;
     amount: Attribute.Integer;
     unit_price: Attribute.Decimal;
-    currency: Attribute.String;
+    currency: Attribute.String & Attribute.DefaultTo<'COP'>;
     subtotal: Attribute.Decimal;
+    variation: Attribute.Relation<
+      'api::product-order.product-order',
+      'oneToOne',
+      'api::variation.variation'
+    >;
+    order: Attribute.Relation<
+      'api::product-order.product-order',
+      'manyToOne',
+      'api::order.order'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

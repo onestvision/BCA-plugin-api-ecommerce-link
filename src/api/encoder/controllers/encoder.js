@@ -6,10 +6,17 @@
 
 module.exports = {
   async encrypt(ctx) {
-    try {      
-      const dataString = JSON.stringify(ctx.request.body);
+    try {
       
-      const encoderData = await strapi.service('api::encoder.encoder').encrypt(dataString);
+      const completeBody = {
+        ...ctx.request.body,
+        generateDate: Date.now(),
+        tokenDuration: process.env.TOKEN_DURATION
+      };
+
+      const bodyString = JSON.stringify(completeBody);
+      
+      const encoderData = await strapi.service('api::encoder.encoder').encrypt(bodyString);
   
       ctx.send({
         message: 'Data encoded correctly',

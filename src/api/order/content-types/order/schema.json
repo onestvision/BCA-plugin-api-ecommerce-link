@@ -22,12 +22,13 @@
         "Processing",
         "Failed",
         "Canceled"
-      ]
+      ],
+      "default": "Processing"
     },
-    "customer": {
+    "user": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::customer.customer",
+      "target": "plugin::users-permissions.user",
       "inversedBy": "orders"
     },
     "transaction": {
@@ -36,16 +37,16 @@
       "target": "api::transaction.transaction",
       "mappedBy": "order"
     },
-    "product_order": {
+    "product_orders": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "oneToMany",
       "target": "api::product-order.product-order",
       "mappedBy": "order"
     },
     "order_id": {
       "type": "string",
       "unique": true,
-      "required": true
+      "required": false
     }
   }
 }
