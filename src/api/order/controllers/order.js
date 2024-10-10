@@ -10,8 +10,6 @@ module.exports = createCoreController('api::order.order',({ strapi }) => ({
   async createOrder(ctx) {
     try {
       const { phone_number, products, discount, coupon, total } = ctx.request.body;
-
-      console.log(phone_number);
       
       if (!phone_number || phone_number.trim().length === 0){
         return ctx.badRequest('The "phone_number" field must be a non-null field.');
@@ -33,7 +31,7 @@ module.exports = createCoreController('api::order.order',({ strapi }) => ({
         return ctx.badRequest(`The user with phone number ${phone_number} not found.`);
       } 
       
-      const newOrder = await strapi.service('api::order.order').createOrder(phone_number[0].id, products, discount, coupon, total);
+      const newOrder = await strapi.service('api::order.order').createOrder(user[0].id, products, discount, coupon, total);
       
       return newOrder;
     } catch (error) {

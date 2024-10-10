@@ -12,18 +12,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "customer": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::customer.customer",
-      "inversedBy": "transactions"
-    },
-    "order": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::order.order",
-      "inversedBy": "transaction"
-    },
     "transaction_date": {
       "type": "datetime"
     },
@@ -55,6 +43,12 @@
       "type": "string",
       "unique": true,
       "required": true
+    },
+    "order": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::order.order",
+      "inversedBy": "transactions"
     }
   }
 }

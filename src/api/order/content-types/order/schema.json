@@ -31,9 +31,9 @@
       "target": "plugin::users-permissions.user",
       "inversedBy": "orders"
     },
-    "transaction": {
+    "transactions": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "oneToMany",
       "target": "api::transaction.transaction",
       "mappedBy": "order"
     },
@@ -57,6 +57,10 @@
     },
     "total": {
       "type": "decimal"
+    },
+    "link": {
+      "type": "string",
+      "unique": true
     }
   }
 }

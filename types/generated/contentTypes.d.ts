@@ -1033,11 +1033,6 @@ export interface ApiCustomerCustomer extends Schema.CollectionType {
     country: Attribute.String;
     address: Attribute.String;
     company_name: Attribute.String;
-    transactions: Attribute.Relation<
-      'api::customer.customer',
-      'oneToMany',
-      'api::transaction.transaction'
-    >;
     user: Attribute.Relation<
       'api::customer.customer',
       'manyToOne',
@@ -1150,9 +1145,9 @@ export interface ApiOrderOrder extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.user'
     >;
-    transaction: Attribute.Relation<
+    transactions: Attribute.Relation<
       'api::order.order',
-      'oneToOne',
+      'oneToMany',
       'api::transaction.transaction'
     >;
     product_orders: Attribute.Relation<
@@ -1164,6 +1159,7 @@ export interface ApiOrderOrder extends Schema.CollectionType {
     coupon: Attribute.String & Attribute.Unique;
     discount: Attribute.Decimal;
     total: Attribute.Decimal;
+    link: Attribute.String & Attribute.Unique;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1316,16 +1312,6 @@ export interface ApiTransactionTransaction extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    customer: Attribute.Relation<
-      'api::transaction.transaction',
-      'manyToOne',
-      'api::customer.customer'
-    >;
-    order: Attribute.Relation<
-      'api::transaction.transaction',
-      'oneToOne',
-      'api::order.order'
-    >;
     transaction_date: Attribute.DateTime;
     payment_id: Attribute.String;
     payment_method: Attribute.String;
@@ -1336,6 +1322,11 @@ export interface ApiTransactionTransaction extends Schema.CollectionType {
     subtotal: Attribute.Decimal;
     total: Attribute.Decimal;
     transaction_id: Attribute.String & Attribute.Required & Attribute.Unique;
+    order: Attribute.Relation<
+      'api::transaction.transaction',
+      'manyToOne',
+      'api::order.order'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

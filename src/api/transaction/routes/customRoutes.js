@@ -1,15 +1,9 @@
-'use strict';
-
-/*
-  payment router
-*/
-
 module.exports = {
   routes: [
     {
       method: 'POST',
-      path: '/payment',
-      handler: 'payment.processPayment',
+      path: '/transactions/payment',
+      handler: 'transaction.processPayment',
       config: {
         policies: [],
         middlewares: [],
