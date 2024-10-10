@@ -50,12 +50,6 @@
     "company_name": {
       "type": "string"
     },
-    "transactions": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::transaction.transaction",
-      "mappedBy": "customer"
-    },
     "user": {
       "type": "relation",
       "relation": "manyToOne",

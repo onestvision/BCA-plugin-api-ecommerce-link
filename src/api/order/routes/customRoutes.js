@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * encoder router
+ * order router
  */
 
 module.exports = {
