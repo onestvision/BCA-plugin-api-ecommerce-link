@@ -15,16 +15,6 @@
     "description": {
       "type": "text"
     },
-    "status": {
-      "type": "enumeration",
-      "enum": [
-        "Completed",
-        "Processing",
-        "Failed",
-        "Canceled"
-      ],
-      "default": "Processing"
-    },
     "user": {
       "type": "relation",
       "relation": "manyToOne",
@@ -50,7 +40,7 @@
     },
     "coupon": {
       "type": "string",
-      "unique": true
+      "unique": false
     },
     "discount": {
       "type": "decimal"
@@ -61,6 +51,10 @@
     "link": {
       "type": "string",
       "unique": true
+    },
+    "status": {
+      "type": "string",
+      "default": "processing"
     }
   }
 }

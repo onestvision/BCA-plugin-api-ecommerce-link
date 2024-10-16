@@ -24,11 +24,12 @@
     "status": {
       "type": "enumeration",
       "enum": [
-        "Completed",
-        "Processing",
-        "Failed",
-        "Canceled"
-      ]
+        "completed",
+        "processing",
+        "failed",
+        "canceled"
+      ],
+      "default": "processing"
     },
     "taxes": {
       "type": "decimal"
@@ -48,6 +49,12 @@
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::order.order",
+      "inversedBy": "transactions"
+    },
+    "customer": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::customer.customer",
       "inversedBy": "transactions"
     }
   }

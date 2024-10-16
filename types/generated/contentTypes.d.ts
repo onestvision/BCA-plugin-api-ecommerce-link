@@ -1022,8 +1022,7 @@ export interface ApiCustomerCustomer extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    name: Attribute.String;
-    last_name: Attribute.String;
+    full_name: Attribute.String;
     identify_number: Attribute.String & Attribute.Required & Attribute.Unique;
     identification_type: Attribute.String;
     phone_number: Attribute.String & Attribute.Required & Attribute.Unique;
@@ -1038,6 +1037,12 @@ export interface ApiCustomerCustomer extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.user'
     >;
+    transactions: Attribute.Relation<
+      'api::customer.customer',
+      'oneToMany',
+      'api::transaction.transaction'
+    >;
+    predetermined: Attribute.Boolean & Attribute.DefaultTo<false>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1136,10 +1141,6 @@ export interface ApiOrderOrder extends Schema.CollectionType {
   };
   attributes: {
     description: Attribute.Text;
-    status: Attribute.Enumeration<
-      ['Completed', 'Processing', 'Failed', 'Canceled']
-    > &
-      Attribute.DefaultTo<'Processing'>;
     user: Attribute.Relation<
       'api::order.order',
       'manyToOne',
@@ -1156,10 +1157,11 @@ export interface ApiOrderOrder extends Schema.CollectionType {
       'api::product-order.product-order'
     >;
     order_id: Attribute.String & Attribute.Unique;
-    coupon: Attribute.String & Attribute.Unique;
+    coupon: Attribute.String;
     discount: Attribute.Decimal;
     total: Attribute.Decimal;
     link: Attribute.String & Attribute.Unique;
+    status: Attribute.String & Attribute.DefaultTo<'processing'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1316,8 +1318,9 @@ export interface ApiTransactionTransaction extends Schema.CollectionType {
     payment_id: Attribute.String;
     payment_method: Attribute.String;
     status: Attribute.Enumeration<
-      ['Completed', 'Processing', 'Failed', 'Canceled']
-    >;
+      ['completed', 'processing', 'failed', 'canceled']
+    > &
+      Attribute.DefaultTo<'processing'>;
     taxes: Attribute.Decimal;
     subtotal: Attribute.Decimal;
     total: Attribute.Decimal;
@@ -1326,6 +1329,11 @@ export interface ApiTransactionTransaction extends Schema.CollectionType {
       'api::transaction.transaction',
       'manyToOne',
       'api::order.order'
+    >;
+    customer: Attribute.Relation<
+      'api::transaction.transaction',
+      'manyToOne',
+      'api::customer.customer'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
