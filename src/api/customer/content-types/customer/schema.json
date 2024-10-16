@@ -12,10 +12,7 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "name": {
-      "type": "string"
-    },
-    "last_name": {
+    "full_name": {
       "type": "string"
     },
     "identify_number": {
@@ -55,6 +52,16 @@
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
       "inversedBy": "customers"
+    },
+    "transactions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::transaction.transaction",
+      "mappedBy": "customer"
+    },
+    "predetermined": {
+      "type": "boolean",
+      "default": false
     }
   }
 }
