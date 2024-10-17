@@ -26,12 +26,12 @@ module.exports = createCoreController('api::order.order',({ strapi }) => ({
           },
         },
       });
-  
+      
       if (user.length === 0) {
-        return ctx.badRequest(`The user with phone number ${phone_number} not found.`);
+        return ctx.notFound(`The user with phone number ${phone_number} not found.`);
       } 
       
-      const newOrder = await strapi.service('api::order.order').createOrder(user[0].id, products, discount, coupon, total);
+      const newOrder = await strapi.service('api::order.order').createOrder(user[0], products, discount, coupon, total);
       
       return newOrder;
     } catch (error) {

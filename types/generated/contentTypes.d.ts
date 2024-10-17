@@ -1031,7 +1031,7 @@ export interface ApiCustomerCustomer extends Schema.CollectionType {
     department_code: Attribute.String;
     country: Attribute.String;
     address: Attribute.String;
-    company_name: Attribute.String;
+    razon_social: Attribute.String;
     user: Attribute.Relation<
       'api::customer.customer',
       'manyToOne',

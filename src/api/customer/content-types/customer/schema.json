@@ -44,7 +44,7 @@
     "address": {
       "type": "string"
     },
-    "company_name": {
+    "razon_social": {
       "type": "string"
     },
     "user": {
