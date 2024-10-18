@@ -46,7 +46,7 @@
       "type": "decimal"
     },
     "total": {
-      "type": "decimal"
+      "type": "float"
     },
     "link": {
       "type": "string",
@@ -55,6 +55,9 @@
     "status": {
       "type": "string",
       "default": "processing"
+    },
+    "subtotal": {
+      "type": "float"
     }
   }
 }

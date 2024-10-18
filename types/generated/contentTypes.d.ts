@@ -1159,9 +1159,10 @@ export interface ApiOrderOrder extends Schema.CollectionType {
     order_id: Attribute.String & Attribute.Unique;
     coupon: Attribute.String;
     discount: Attribute.Decimal;
-    total: Attribute.Decimal;
+    total: Attribute.Float;
     link: Attribute.String & Attribute.Unique;
     status: Attribute.String & Attribute.DefaultTo<'processing'>;
+    subtotal: Attribute.Float;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

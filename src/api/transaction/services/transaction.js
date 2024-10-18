@@ -7,31 +7,30 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
   async processPayment(data) {
     try {
       const { transaction } = data;
-
       const { payment_link_id, shipping_address, customer_data, amount_in_cents, status, finalized_at, id, payment_method_type } = transaction;
-
+      
       const order = await strapi.entityService.findMany('api::order.order', {
         filters: { link: { $eq: payment_link_id } },
         populate: 'user',
       });
 
       if (order.length == 0) {
-        throw new Error('Orden no encontrada.');
+        throw new Error('Order not found.');
       }
-      
+
       const user = order[0].user;
-      
+
       let customer;
       if (shipping_address) {
-        customer= await strapi.entityService.findMany('api::customer.customer', {
+        customer = await strapi.entityService.findMany('api::customer.customer', {
           filters: { identify_number: { $eq: customer_data.customer_references[0].value.trim() } },
         })
-        
+
         if (customer.length == 0) {
           const { full_name } = customer_data;
           const address = `${shipping_address.address_line_1} ${shipping_address.address_line_2}`;
           const department_code = shipping_address.region === 'departments["CO-DC"]' ? 'Bogota D.C' : shipping_address.region;
-          
+
           customer = await strapi.entityService.create('api::customer.customer', {
             data: {
               full_name,
@@ -72,22 +71,21 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
         },
       });
 
-      const message = status === "APPROVED" 
-                      ? `¡Tu pago ha sido procesado con éxito para la orden ${order[0].order_id}! 🎊 El comprobante de tu transacción es ${transaction_id}. ¡Gracias por elegirnos! 🌟` 
-                      : "Ha ocurrido un error con tu pago. 😔 Te pedimos que lo intentes de nuevo en unos minutos. Si persiste el problema, no dudes en contactarnos. ¡Gracias por tu paciencia!"
+      const message = status === "APPROVED"
+        ? `🎊*¡Tu pago ha sido procesado con éxito!*🎊\n El comprobante de tu transacción es ${transaction_id}.\n🌟 ¡Gracias por elegirnos! 🌟`
+        : "Ha ocurrido un error con tu pago. 😔 Intentalo de nuevo en unos minutos.\n Si persiste el problema, no dudes en contactarnos.\n ¡Gracias por tu paciencia!"
 
       await sendWhatsAppMessage("Xeletiene",message, user.phone_number)
 
-      
-      if (status === "APPROVED") {
-        await strapi.entityService.update('api::order.order', order[0].id, {
-          data: { status: "Completed" },
-        });
-        //await createTransaction(transaction_id);
-      }
+      await strapi.entityService.update('api::order.order', order[0].id, {
+        data: { status: "completed" },
+      });
+
+      await createTransaction("xeletiene", transaction_id);
+
       return newTransaction
     } catch (error) {
-      console.error('Errores de validación:', error.details?.errors);
+      console.error('We have problems creating a new transaction', error.details?.errors);
       throw error;
     }
   }

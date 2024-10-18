@@ -1,7 +1,7 @@
 const axios = require('axios')
 
 async function sendWhatsAppMessage(bussiness, message, phoneNumber) {
-  const url = process.env.GATEWAY_URL
+  const url = `${process.env.GATEWAY_URL}/WhatsApp/SendMessage`
 
   if (message.trim() == "") {
     throw new Error("The message must not be empty")
@@ -12,7 +12,7 @@ async function sendWhatsAppMessage(bussiness, message, phoneNumber) {
   }
 
   try {
-    await axios.post(`${url}/WhatsApp/SendMessage`, {
+    await axios.post(url, {
       bussiness: bussiness,
       message: message.trim(),
       phoneNumbers: [phoneNumber.trim()]
