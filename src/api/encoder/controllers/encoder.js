@@ -1,5 +1,5 @@
 'use strict';
-
+const { encrypt } = require("../../../utils/encoder/encrypt.js")
 /**
  * encoder controller
  */
@@ -16,7 +16,7 @@ module.exports = {
 
       const bodyString = JSON.stringify(completeBody);
       
-      const encoderData = await strapi.service('api::encoder.encoder').encrypt(bodyString);
+      const encoderData = encrypt(bodyString);
   
       ctx.send({
         message: 'Data encoded correctly',
