@@ -17,7 +17,7 @@ async function createTransaction(company, transaction_id) {
     throw new Error('Orden no encontrada.');
   }
   const order = await strapi.entityService.findOne('api::order.order', transaction[0].order.id, {
-    populate: ['product_orders.product', 'product_orders.variation'],
+    populate: 'product_orders.products',
   });
   if (order.length == 0) {
     throw new Error('Orden not founds.');
@@ -27,11 +27,14 @@ async function createTransaction(company, transaction_id) {
   const { product_orders } = order
   const { firstName, lastName } = splitFullName(transactionSelected.customer.full_name)
 
-  const products = product_orders.map( product => {
+  console.log(order);
+  
+
+  const products = product_orders[0].products.map( product => {
     const unit_price = product.unit_price
-    const amount = product.unit_price
-    const product_id = Number(product.product.sku)
-    const variation_id = product.variation == null ? null : product.product.sku 
+    const amount = product.amount
+    const product_id = Number(product.product_id)
+    const variation_id = product.variation_id == null ? null : product.variation_id
     return {
       id_variacion: variation_id,
       id_producto: product_id,

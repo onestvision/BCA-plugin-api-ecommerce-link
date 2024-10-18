@@ -12,28 +12,11 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "product": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::product.product"
-    },
-    "amount": {
-      "type": "integer"
-    },
-    "unit_price": {
-      "type": "decimal"
-    },
-    "currency": {
-      "type": "string",
-      "default": "COP"
-    },
-    "subtotal": {
-      "type": "decimal"
-    },
-    "variation": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::variation.variation"
+    "products": {
+      "displayName": "products",
+      "type": "component",
+      "repeatable": true,
+      "component": "product.products"
     },
     "order": {
       "type": "relation",

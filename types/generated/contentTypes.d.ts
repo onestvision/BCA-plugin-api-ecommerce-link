@@ -1266,20 +1266,7 @@ export interface ApiProductOrderProductOrder extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    product: Attribute.Relation<
-      'api::product-order.product-order',
-      'oneToOne',
-      'api::product.product'
-    >;
-    amount: Attribute.Integer;
-    unit_price: Attribute.Decimal;
-    currency: Attribute.String & Attribute.DefaultTo<'COP'>;
-    subtotal: Attribute.Decimal;
-    variation: Attribute.Relation<
-      'api::product-order.product-order',
-      'oneToOne',
-      'api::variation.variation'
-    >;
+    products: Attribute.Component<'product.products', true>;
     order: Attribute.Relation<
       'api::product-order.product-order',
       'manyToOne',

@@ -1,13 +1,13 @@
 const { createCoreService } = require('@strapi/strapi').factories;
+const { filter } = require('../../../../config/middlewares');
 const { sendWhatsAppMessage } = require("../../../utils/messageSender/sendMessage");
 
 module.exports = createCoreService('api::order.order', ({ strapi }) => ({
   async createOrder(user, products, coupon, discount, subtotal, total) {
     try {
-      console.log(subtotal);
-      
       let orderDescription = "";
       let orderId = ""
+
       let order = await strapi.entityService.findMany('api::order.order', {
         filters: {
           user: { $eq: user.id },
@@ -15,7 +15,6 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
         }
       })
 
-      // If the order not exist create a new order if exist select the order created previously
       if (order.length == 0) {
         orderId = `OR${Math.floor(100000 + Math.random() * 900000)}`;
         order = await strapi.entityService.create('api::order.order', {
@@ -29,6 +28,7 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
         });
       } else {
         order = order[0]
+
         orderId = order.order_id.substring(0, 8);
         if (order.status == "processing") {
           await strapi.entityService.update('api::order.order', order.id, {
@@ -43,37 +43,49 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
           });
         }
       }
+      const productsOfOrder = []
 
-      const processProduct = async (product) => {
-        let variation, prod;
-
-        if (product.variation_id) {
-          variation = await strapi.entityService.findMany('api::variation.variation', {
-            filter: { sku: { eq: product.variation_id } },
-            populate: 'product',
-          });
-          variation = variation[0]
-
-          prod = variation?.product;
-        } else if (product.product_id) {
-          prod = await strapi.entityService.findOne('api::product.product', product.product_id);
+      const processProduct = (product) => {
+        const product_info = {
+          product_name: product.product_name,
+          variation_description: product.variation_description,
+          variation_id: product.variation_id,
+          product_id: product.product_id,
+          amount: product.amount,
+          unit_price: product.unit_price,
         }
+        productsOfOrder.push(product_info)
 
+        return product.variation_description ? `${product.product_name}-${product.variation_description}  x ${product.amount}\n` : `${product.product_name} x ${product.amount}\n`;
+      };
+
+      const productDescriptions = products.map(processProduct);
+
+      const product_orders = await strapi.entityService.findMany('api::product-order.product-order', {
+        populate: '*',
+        filters: {
+          order:{
+            id:{ $eq : order.id }
+          }
+        }
+      })
+
+      if (product_orders.length == 0) {
         await strapi.entityService.create('api::product-order.product-order', {
           data: {
             order: order.id,
-            amount: product.amount,
-            unit_price: product.unit_price,
-            subtotal: product.amount * product.unit_price,
-            variation: variation?.id || null,
-            product: prod?.id || null,
+            products: productsOfOrder
           },
         });
+      } else {
+        await strapi.entityService.update('api::product-order.product-order', product_orders[0].id, {
+          data: {
+            order: order.id,
+            products: productsOfOrder
+          },
+        });
+      }
 
-        return variation ? `${variation.name} x ${product.amount}\n` : `${prod?.name} x ${product.amount}\n`;
-      };
-
-      const productDescriptions = await Promise.all(products.map(processProduct));
       orderDescription = productDescriptions.join('');
 
       const updatedOrder = await strapi.entityService.update('api::order.order', order.id, {
