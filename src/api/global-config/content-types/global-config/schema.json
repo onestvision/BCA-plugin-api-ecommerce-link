@@ -8,7 +8,7 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
@@ -85,6 +85,13 @@
       "relation": "oneToMany",
       "target": "api::variation.variation",
       "mappedBy": "global_config"
+    },
+    "integration_type": {
+      "type": "enumeration",
+      "enum": [
+        "manual",
+        "woocomerce"
+      ]
     }
   }
 }
