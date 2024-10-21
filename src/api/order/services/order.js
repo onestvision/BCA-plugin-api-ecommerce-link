@@ -56,7 +56,7 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
         }
         productsOfOrder.push(product_info)
 
-        return product.variation_description ? `${product.product_name}-${product.variation_description}  x ${product.amount}\n` : `${product.product_name} x ${product.amount}\n`;
+        return product.variation_id ? `${product.product_name}-${product.variation_description}  x ${product.amount}\n` : `${product.product_name} x ${product.amount}\n`;
       };
 
       const productDescriptions = products.map(processProduct);
