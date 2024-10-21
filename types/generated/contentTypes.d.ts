@@ -808,7 +808,7 @@ export interface ApiAttributeAttribute extends Schema.CollectionType {
     description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     name: Attribute.String & Attribute.Required & Attribute.DefaultTo<'color'>;
@@ -824,7 +824,6 @@ export interface ApiAttributeAttribute extends Schema.CollectionType {
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
       'api::attribute.attribute',
       'oneToOne',
@@ -849,7 +848,7 @@ export interface ApiAttributeValueAttributeValue extends Schema.CollectionType {
     description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     value: Attribute.String & Attribute.Required & Attribute.DefaultTo<'rojo'>;
@@ -860,7 +859,6 @@ export interface ApiAttributeValueAttributeValue extends Schema.CollectionType {
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
       'api::attribute-value.attribute-value',
       'oneToOne',
@@ -885,7 +883,7 @@ export interface ApiBrandBrand extends Schema.CollectionType {
     description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     name: Attribute.String & Attribute.Required;
@@ -898,7 +896,6 @@ export interface ApiBrandBrand extends Schema.CollectionType {
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
       'api::brand.brand',
       'oneToOne',
@@ -923,7 +920,7 @@ export interface ApiCategoryCategory extends Schema.CollectionType {
     description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     name: Attribute.String &
@@ -956,7 +953,6 @@ export interface ApiCategoryCategory extends Schema.CollectionType {
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
       'api::category.category',
       'oneToOne',
@@ -978,9 +974,10 @@ export interface ApiColectionColection extends Schema.CollectionType {
     singularName: 'colection';
     pluralName: 'colections';
     displayName: 'Colection';
+    description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     name: Attribute.String & Attribute.Required;
@@ -994,7 +991,6 @@ export interface ApiColectionColection extends Schema.CollectionType {
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
       'api::colection.colection',
       'oneToOne',
@@ -1019,7 +1015,7 @@ export interface ApiCustomerCustomer extends Schema.CollectionType {
     description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     full_name: Attribute.String;
@@ -1045,7 +1041,6 @@ export interface ApiCustomerCustomer extends Schema.CollectionType {
     predetermined: Attribute.Boolean & Attribute.DefaultTo<false>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
       'api::customer.customer',
       'oneToOne',
@@ -1070,7 +1065,7 @@ export interface ApiGlobalConfigGlobalConfig extends Schema.CollectionType {
     description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     primary_color: Attribute.String & Attribute.DefaultTo<'#0ba4e4'>;
@@ -1110,9 +1105,9 @@ export interface ApiGlobalConfigGlobalConfig extends Schema.CollectionType {
       'oneToMany',
       'api::variation.variation'
     >;
+    integration_type: Attribute.Enumeration<['manual', 'woocomerce']>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
       'api::global-config.global-config',
       'oneToOne',
@@ -1137,7 +1132,7 @@ export interface ApiOrderOrder extends Schema.CollectionType {
     description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     description: Attribute.Text;
@@ -1165,7 +1160,6 @@ export interface ApiOrderOrder extends Schema.CollectionType {
     subtotal: Attribute.Float;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
       'api::order.order',
       'oneToOne',
@@ -1190,7 +1184,7 @@ export interface ApiProductProduct extends Schema.CollectionType {
     description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     name: Attribute.String &
@@ -1238,7 +1232,6 @@ export interface ApiProductProduct extends Schema.CollectionType {
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
       'api::product.product',
       'oneToOne',
@@ -1263,7 +1256,7 @@ export interface ApiProductOrderProductOrder extends Schema.CollectionType {
     description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     products: Attribute.Component<'product.products', true>;
@@ -1274,7 +1267,6 @@ export interface ApiProductOrderProductOrder extends Schema.CollectionType {
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
       'api::product-order.product-order',
       'oneToOne',
@@ -1299,7 +1291,7 @@ export interface ApiTransactionTransaction extends Schema.CollectionType {
     description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     transaction_date: Attribute.DateTime;
@@ -1325,7 +1317,6 @@ export interface ApiTransactionTransaction extends Schema.CollectionType {
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
       'api::transaction.transaction',
       'oneToOne',
@@ -1350,7 +1341,7 @@ export interface ApiVariationVariation extends Schema.CollectionType {
     description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     product: Attribute.Relation<
@@ -1390,7 +1381,6 @@ export interface ApiVariationVariation extends Schema.CollectionType {
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
       'api::variation.variation',
       'oneToOne',
