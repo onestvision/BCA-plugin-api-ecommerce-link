@@ -27,9 +27,6 @@ async function createTransaction(company, transaction_id) {
   const { product_orders } = order
   const { firstName, lastName } = splitFullName(transactionSelected.customer.full_name)
 
-  console.log(order);
-  
-
   const products = product_orders[0].products.map( product => {
     const unit_price = product.unit_price
     const amount = product.amount

@@ -1,12 +1,14 @@
 const { createCoreService } = require('@strapi/strapi').factories;
-const { filter } = require('../../../../config/middlewares');
+const axios = require('axios');
 const { sendWhatsAppMessage } = require("../../../utils/messageSender/sendMessage");
+const { getToken } = require('../../../utils/kasoft/getToken');
 
 module.exports = createCoreService('api::order.order', ({ strapi }) => ({
   async createOrder(user, products, coupon, discount, subtotal, total) {
     try {
       let orderDescription = "";
       let orderId = ""
+      let newOrder = true
 
       let order = await strapi.entityService.findMany('api::order.order', {
         filters: {
@@ -17,6 +19,7 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
 
       if (order.length == 0) {
         orderId = `OR${Math.floor(100000 + Math.random() * 900000)}`;
+        newOrder = true
         order = await strapi.entityService.create('api::order.order', {
           data: {
             user: user.id,
@@ -27,6 +30,7 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
           },
         });
       } else {
+        newOrder = false
         order = order[0]
 
         orderId = order.order_id.substring(0, 8);
@@ -56,7 +60,9 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
         }
         productsOfOrder.push(product_info)
 
-        return product.variation_id ? `${product.product_name}-${product.variation_description}  x ${product.amount}\n` : `${product.product_name} x ${product.amount}\n`;
+        return product.variation_id
+          ? `${product.product_name} ${product.variation_description} - $${product.unit_price} x ${product.amount}\n`
+          : `${product.product_name} - $${product.unit_price} x ${product.amount}\n`;
       };
 
       const productDescriptions = products.map(processProduct);
@@ -64,8 +70,8 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
       const product_orders = await strapi.entityService.findMany('api::product-order.product-order', {
         populate: '*',
         filters: {
-          order:{
-            id:{ $eq : order.id }
+          order: {
+            id: { $eq: order.id }
           }
         }
       })
@@ -96,13 +102,46 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
         populate: 'product_orders',
       });
 
-      const message = `🎉 *Hemos recibido tu orden con éxito.* 🎉\nTu número de orden es *${orderId}${order.id}*.\n\nLos productos de tu orden son:\n${orderDescription}\nSi deseas continuar con la compra, por favor responde a este mensaje con las palabras *Continuar Compra*.\n\n¡Gracias por tu preferencia! 😊`
+      const statusMessage = newOrder ? "recibido" : "modificado"
+
+      const message = `
+      🎉 *Hemos ${statusMessage} tu orden con éxito.* 🎉\nTu número de orden es *${orderId}${order.id}*.\n\nLos productos de tu orden son:\n${orderDescription}\nSubtotal: $${subtotal}\nDescuento: $${discount}\nTotal: $${total}\n\nSi deseas continuar con la compra, por favor responde a este mensaje con las palabras *Continuar Compra*.\n\n¡Gracias por tu preferencia! 😊`
 
       await sendWhatsAppMessage("Xeletiene", message, user.phone_number)
 
       return updatedOrder;
     } catch (error) {
       throw new Error('Error processing order: ' + error.message);
+    }
+  },
+  async cancelOrder(order_id, company) {
+    let response;
+    const url = `${process.env.KASOFT_URL}/${company}/transactions/status`
+    const order = await strapi.entityService.findOne('api::order.order', order_id, {
+      populate: "transactions"
+    });
+
+    if (order.status == "completed") {
+      throw new Error("An order completed can't be modified")
+    }
+    
+    try {
+      if (order.transactions.length == 0) {
+        response = await strapi.entityService.delete('api::order.order', order_id);
+      } else {
+        const token = await getToken(company)
+        response = await axios.put(url, {
+          transaction_id: order.transactions[0].transaction_id,
+          status: "canceled"
+        },{
+          headers:{
+            Authorization: `Bearer ${token}`
+          }
+        })
+      }
+      return response
+    } catch (error) {
+      return error
     }
   }
 }));

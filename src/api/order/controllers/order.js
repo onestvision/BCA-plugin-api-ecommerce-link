@@ -38,4 +38,15 @@ module.exports = createCoreController('api::order.order',({ strapi }) => ({
       ctx.throw(500, error);
     }
   },
+  async cancelOrder(ctx) {
+    const { order_id, company } = ctx.request.body;
+    try {
+      if (order_id && company) {
+        return await strapi.service('api::order.order').cancelOrder(order_id,company);
+      }
+      return ctx.badRequest()
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }));;
