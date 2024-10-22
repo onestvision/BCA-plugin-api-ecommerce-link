@@ -15,5 +15,14 @@ module.exports = {
         middlewares: [],
       },
     },
+    {
+      method: 'POST',
+      path: '/orders/cancel',
+      handler: 'order.cancelOrder',
+      config: {
+        policies: [],
+        middlewares: [],
+      },
+    }
   ],
 };

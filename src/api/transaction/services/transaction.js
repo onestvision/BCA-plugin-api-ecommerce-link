@@ -8,7 +8,7 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
     try {
       const { transaction } = data;
       const { payment_link_id, shipping_address, customer_data, amount_in_cents, status, finalized_at, id, payment_method_type } = transaction;
-      
+
       const order = await strapi.entityService.findMany('api::order.order', {
         filters: { link: { $eq: payment_link_id } },
         populate: 'user',
@@ -54,7 +54,7 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
       const taxes = 0;
       const subtotal = amount_in_cents / 100;
       const total = taxes + subtotal;
-      const transactionStatus = status === "APPROVED" ? "completed" : status === "DECLINED" ? "failed" : "canceled";
+      const transactionStatus = status === "APPROVED" ? "completed" : "failed";
       const transaction_id = `TR${Math.floor(100000 + Math.random() * 900000)}${order[0].id}`
       const newTransaction = await strapi.entityService.create('api::transaction.transaction', {
         data: {
@@ -72,14 +72,15 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
       });
 
       const message = status === "APPROVED"
-        ? `🎊*¡Tu pago ha sido procesado con éxito!*🎊\n El comprobante de tu transacción es ${transaction_id}.\n🌟 ¡Gracias por elegirnos! 🌟`
-        : "Ha ocurrido un error con tu pago. 😔 Intentalo de nuevo en unos minutos.\n Si persiste el problema, no dudes en contactarnos.\n ¡Gracias por tu paciencia!"
+        ? `🎊*¡Tu pago ha sido procesado con éxito!*🎊\n El comprobante de tu transacción es ${transaction_id}.\n\nLos detalles de tu orden son:\n${order[0].description}\nSubtotal: $${subtotal}\nImpuestos: $${taxes}\nTotal: $${total}\n\n🌟 ¡Gracias por elegirnos! 🌟`
+        : "Ha ocurrido un error con tu pago. 😔 Si quieres intentarlo de nuevo envia el mensaje *reintentar compra*.\n Si persiste el problema, no dudes en contactarnos.\n ¡Gracias por tu paciencia!"
 
       await sendWhatsAppMessage("Xeletiene",message, user.phone_number)
-
-      await strapi.entityService.update('api::order.order', order[0].id, {
-        data: { status: "completed" },
-      });
+      if (status === "APPROVED") {
+        await strapi.entityService.update('api::order.order', order[0].id, {
+          data: { status: "completed" },
+        });
+      }
 
       await createTransaction("xeletiene", transaction_id);
 
