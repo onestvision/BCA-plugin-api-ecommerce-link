@@ -2,6 +2,7 @@ const { createCoreService } = require('@strapi/strapi').factories;
 const axios = require('axios');
 const { sendWhatsAppMessage } = require("../../../utils/messageSender/sendMessage");
 const { getToken } = require('../../../utils/kasoft/getToken');
+const { sendWhatsAppInteractive } = require('../../../utils/messageSender/sendInteractive');
 
 module.exports = createCoreService('api::order.order', ({ strapi }) => ({
   async createOrder(user, products, coupon, discount, subtotal, total) {
@@ -103,11 +104,12 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
       });
 
       const statusMessage = newOrder ? "recibido" : "modificado"
+      const discountMessage = discount > 0 ? `Descuento: $${discount}\n` : null
 
       const message = `
-      🎉 *Hemos ${statusMessage} tu orden con éxito.* 🎉\nTu número de orden es *${orderId}${order.id}*.\n\nLos productos de tu orden son:\n${orderDescription}\nSubtotal: $${subtotal}\nDescuento: $${discount}\nTotal: $${total}\n\nSi deseas continuar con la compra, por favor responde a este mensaje con las palabras *Continuar Compra*.\n\n¡Gracias por tu preferencia! 😊`
+      🎉 *Hemos ${statusMessage} tu orden con éxito.* 🎉\nTu número de orden es *${orderId}${order.id}*.\n\nLos productos de tu orden son:\n${orderDescription}\nSubtotal: $${subtotal}\n${discountMessage}*Total: $${total}*\n\nSi deseas finalizar la compra, presiona el boton *Finalizar Compra*.\n\n¡Gracias por tu preferencia! 😊`
 
-      await sendWhatsAppMessage("Xeletiene", message, user.phone_number)
+      await sendWhatsAppInteractive("Xeletiene", message, user.phone_number, ["Finalizar compra"])
 
       return updatedOrder;
     } catch (error) {
@@ -124,7 +126,7 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
     if (order.status == "completed") {
       throw new Error("An order completed can't be modified")
     }
-    
+
     try {
       if (order.transactions.length == 0) {
         response = await strapi.entityService.delete('api::order.order', order_id);
@@ -133,8 +135,8 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
         response = await axios.put(url, {
           transaction_id: order.transactions[0].transaction_id,
           status: "canceled"
-        },{
-          headers:{
+        }, {
+          headers: {
             Authorization: `Bearer ${token}`
           }
         })

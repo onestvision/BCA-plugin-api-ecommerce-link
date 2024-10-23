@@ -70,12 +70,13 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
           customer: customer?.id || null,
         },
       });
+      const taxesMessage = taxes > 0 ? `Impuestos: $${taxes}\n` : null
 
       const message = status === "APPROVED"
-        ? `🎊*¡Tu pago ha sido procesado con éxito!*🎊\n El comprobante de tu transacción es ${transaction_id}.\n\nLos detalles de tu orden son:\n${order[0].description}\nSubtotal: $${subtotal}\nImpuestos: $${taxes}\nTotal: $${total}\n\n🌟 ¡Gracias por elegirnos! 🌟`
+        ? `🎊 *¡Tu pago ha sido procesado con éxito!* 🎊\nEl comprobante de tu transacción es *${transaction_id}*.\n\nLos detalles de tu orden son:\n${order[0].description}\nSubtotal: $${subtotal}\n${taxesMessage}*Total: $${total}*\n\n🌟 ¡Gracias por elegirnos! 🌟`
         : "Ha ocurrido un error con tu pago. 😔 Si quieres intentarlo de nuevo envia el mensaje *reintentar compra*.\n Si persiste el problema, no dudes en contactarnos.\n ¡Gracias por tu paciencia!"
 
-      await sendWhatsAppMessage("Xeletiene",message, user.phone_number)
+      await sendWhatsAppMessage("Xeletiene", message, user.phone_number)
       if (status === "APPROVED") {
         await strapi.entityService.update('api::order.order', order[0].id, {
           data: { status: "completed" },
