@@ -1,6 +1,7 @@
 'use strict';
 const { createCoreService } = require('@strapi/strapi').factories;
 const { createTransaction } = require('../../../utils/kasoft/createTransaction');
+const { sendWhatsAppInteractive } = require('../../../utils/messageSender/sendInteractive');
 const { sendWhatsAppMessage } = require("../../../utils/messageSender/sendMessage");
 
 module.exports = createCoreService('api::transaction.transaction', ({ strapi }) => ({
@@ -70,17 +71,21 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
           customer: customer?.id || null,
         },
       });
-      const taxesMessage = taxes > 0 ? `Impuestos: $${taxes}\n` : null
+      const taxesMessage = taxes > 0 ? `Impuestos: $${taxes}\n` : ""
 
-      const message = status === "APPROVED"
-        ? `🎊 *¡Tu pago ha sido procesado con éxito!* 🎊\nEl comprobante de tu transacción es *${transaction_id}*.\n\nLos detalles de tu orden son:\n${order[0].description}\nSubtotal: $${subtotal}\n${taxesMessage}*Total: $${total}*\n\n🌟 ¡Gracias por elegirnos! 🌟`
-        : "Ha ocurrido un error con tu pago. 😔 Si quieres intentarlo de nuevo envia el mensaje *reintentar compra*.\n Si persiste el problema, no dudes en contactarnos.\n ¡Gracias por tu paciencia!"
 
-      await sendWhatsAppMessage("Xeletiene", message, user.phone_number)
+      
+
       if (status === "APPROVED") {
+        const message = `🎊 *¡Tu pago ha sido procesado con éxito!* 🎊\nEl comprobante de tu transacción es *${transaction_id}*.\n\nLos detalles de tu orden son:\n${order[0].description}\nSubtotal: $${subtotal}\n${taxesMessage}*Total: $${total}*\n\n🌟 ¡Gracias por elegirnos! 🌟`
+
+        await sendWhatsAppMessage("Xeletiene", message, user.phone_number)
         await strapi.entityService.update('api::order.order', order[0].id, {
           data: { status: "completed" },
         });
+      } else {
+        const message = "Ha ocurrido un error con tu pago. 😔\nSi quieres intentarlo de nuevo presiona *reintentar compra*.\nSi quieres ir al menu principal presiona *Menu principal*.\nSi persiste el problema, no dudes en contactarnos.\n¡Gracias por tu paciencia!"
+        await sendWhatsAppInteractive("Xeletiene", message, user.phone_number, ["🔄Reintentar compra", "🏠Menu principal"])
       }
 
       await createTransaction("xeletiene", transaction_id);
