@@ -104,12 +104,12 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
       });
 
       const statusMessage = newOrder ? "recibido" : "modificado"
-      const discountMessage = discount > 0 ? `Descuento: $${discount}\n` : null
+      const discountMessage = discount > 0 ? `Descuento: $${discount}\n` : ""
 
       const message = `
       🎉 *Hemos ${statusMessage} tu orden con éxito.* 🎉\nTu número de orden es *${orderId}${order.id}*.\n\nLos productos de tu orden son:\n${orderDescription}\nSubtotal: $${subtotal}\n${discountMessage}*Total: $${total}*\n\nSi deseas finalizar la compra, presiona el boton *Finalizar Compra*.\n\n¡Gracias por tu preferencia! 😊`
 
-      await sendWhatsAppInteractive("Xeletiene", message, user.phone_number, ["Finalizar compra"])
+      await sendWhatsAppInteractive("Xeletiene", message, user.phone_number, ["🛒Finalizar compra"])
 
       return updatedOrder;
     } catch (error) {
