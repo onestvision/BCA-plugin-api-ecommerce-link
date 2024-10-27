@@ -58,6 +58,12 @@
     },
     "subtotal": {
       "type": "float"
+    },
+    "shipping": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::shipping.shipping",
+      "inversedBy": "orders"
     }
   }
 }

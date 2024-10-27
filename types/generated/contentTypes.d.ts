@@ -775,13 +775,18 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::order.order'
     >;
-    customers: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'oneToMany',
-      'api::customer.customer'
-    >;
     name: Attribute.String;
     phone_number: Attribute.String & Attribute.Required & Attribute.Unique;
+    payments: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::payment.payment'
+    >;
+    shippings: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::shipping.shipping'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1028,11 +1033,6 @@ export interface ApiCustomerCustomer extends Schema.CollectionType {
     country: Attribute.String;
     address: Attribute.String;
     razon_social: Attribute.String;
-    user: Attribute.Relation<
-      'api::customer.customer',
-      'manyToOne',
-      'plugin::users-permissions.user'
-    >;
     transactions: Attribute.Relation<
       'api::customer.customer',
       'oneToMany',
@@ -1158,6 +1158,11 @@ export interface ApiOrderOrder extends Schema.CollectionType {
     link: Attribute.String & Attribute.Unique;
     status: Attribute.String & Attribute.DefaultTo<'processing'>;
     subtotal: Attribute.Float;
+    shipping: Attribute.Relation<
+      'api::order.order',
+      'manyToOne',
+      'api::shipping.shipping'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1168,6 +1173,52 @@ export interface ApiOrderOrder extends Schema.CollectionType {
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::order.order',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiPaymentPayment extends Schema.CollectionType {
+  collectionName: 'payments';
+  info: {
+    singularName: 'payment';
+    pluralName: 'payments';
+    displayName: 'Payment';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    full_name: Attribute.String;
+    identify_number: Attribute.String & Attribute.Required & Attribute.Unique;
+    identification_type: Attribute.String;
+    phone_number: Attribute.String & Attribute.Required & Attribute.Unique;
+    email: Attribute.Email;
+    razon_social: Attribute.String;
+    user: Attribute.Relation<
+      'api::payment.payment',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    transactions: Attribute.Relation<
+      'api::payment.payment',
+      'oneToMany',
+      'api::transaction.transaction'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::payment.payment',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::payment.payment',
       'oneToOne',
       'admin::user'
     > &
@@ -1282,6 +1333,56 @@ export interface ApiProductOrderProductOrder extends Schema.CollectionType {
   };
 }
 
+export interface ApiShippingShipping extends Schema.CollectionType {
+  collectionName: 'shippings';
+  info: {
+    singularName: 'shipping';
+    pluralName: 'shippings';
+    displayName: 'Shipping';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    full_name: Attribute.String;
+    phone_number: Attribute.String & Attribute.Required & Attribute.Unique;
+    email: Attribute.Email;
+    city: Attribute.String;
+    department: Attribute.String;
+    country: Attribute.String;
+    address_line_1: Attribute.String;
+    user: Attribute.Relation<
+      'api::shipping.shipping',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    orders: Attribute.Relation<
+      'api::shipping.shipping',
+      'oneToMany',
+      'api::order.order'
+    >;
+    zip_code: Attribute.String;
+    custom_name: Attribute.String;
+    address_line_2: Attribute.String;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::shipping.shipping',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::shipping.shipping',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiTransactionTransaction extends Schema.CollectionType {
   collectionName: 'transactions';
   info: {
@@ -1310,10 +1411,10 @@ export interface ApiTransactionTransaction extends Schema.CollectionType {
       'manyToOne',
       'api::order.order'
     >;
-    customer: Attribute.Relation<
+    payment: Attribute.Relation<
       'api::transaction.transaction',
       'manyToOne',
-      'api::customer.customer'
+      'api::payment.payment'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -1422,8 +1523,10 @@ declare module '@strapi/types' {
       'api::customer.customer': ApiCustomerCustomer;
       'api::global-config.global-config': ApiGlobalConfigGlobalConfig;
       'api::order.order': ApiOrderOrder;
+      'api::payment.payment': ApiPaymentPayment;
       'api::product.product': ApiProductProduct;
       'api::product-order.product-order': ApiProductOrderProductOrder;
+      'api::shipping.shipping': ApiShippingShipping;
       'api::transaction.transaction': ApiTransactionTransaction;
       'api::variation.variation': ApiVariationVariation;
     }
