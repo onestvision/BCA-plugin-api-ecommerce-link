@@ -5,7 +5,7 @@ const { getToken } = require('../../../utils/kasoft/getToken');
 const { sendWhatsAppInteractive } = require('../../../utils/messageSender/sendInteractive');
 
 module.exports = createCoreService('api::order.order', ({ strapi }) => ({
-  async createOrder(user, products, coupon, discount, subtotal, total) {
+  async createOrder(user, products, coupon, discount, subtotal, total, shipping_id) {
     try {
       let orderDescription = "";
       let orderId = ""
@@ -28,6 +28,7 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
             discount: discount,
             subtotal: subtotal,
             total: total,
+            shipping: shipping_id
           },
         });
       } else {
@@ -43,7 +44,8 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
               discount: discount,
               subtotal: subtotal,
               total: total,
-              product_orders: []
+              product_orders: [],
+              shipping: shipping_id
             },
           });
         }
@@ -103,11 +105,11 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
         populate: 'product_orders',
       });
 
-      const statusMessage = newOrder ? "recibido" : "modificado"
+      const statusMessage = newOrder ? "recibido" : "actualizado"
       const discountMessage = discount > 0 ? `Descuento: $${discount}\n` : ""
 
       const message = `
-      🎉 *Hemos ${statusMessage} tu orden con éxito.* 🎉\nTu número de orden es *${orderId}${order.id}*.\n\nLos productos de tu orden son:\n${orderDescription}\nSubtotal: $${subtotal}\n${discountMessage}*Total: $${total}*\n\nSi deseas finalizar la compra, presiona el boton *Finalizar Compra*.\n\n¡Gracias por tu preferencia! 😊`
+      🎉 *${user.name}, he ${statusMessage} tu orden con éxito.* 🎉\nTu número de orden es *${orderId}${order.id}*.\n\nEstos son los detalles de los productos que seleccionaste:\n${orderDescription}\nSubtotal: $${subtotal}\n${discountMessage}*Total: $${total}*\n\nPara completar la compra, solo presiona el botón *Finalizar Compra*. ¡Estoy aquí para hacer tu experiencia lo mejor posible!\n\n😊 *Gracias por preferirnos, ${user.name}. ¡Espero que disfrutes tus productos!*`
 
       await sendWhatsAppInteractive("Xeletiene", message, user.phone_number, ["🛒Finalizar compra"])
 

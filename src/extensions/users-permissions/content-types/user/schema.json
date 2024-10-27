@@ -71,12 +71,6 @@
       "target": "api::order.order",
       "mappedBy": "user"
     },
-    "customers": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::customer.customer",
-      "mappedBy": "user"
-    },
     "name": {
       "type": "string"
     },
@@ -84,6 +78,18 @@
       "type": "string",
       "required": true,
       "unique": true
+    },
+    "payments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::payment.payment",
+      "mappedBy": "user"
+    },
+    "shippings": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::shipping.shipping",
+      "mappedBy": "user"
     }
   }
 }

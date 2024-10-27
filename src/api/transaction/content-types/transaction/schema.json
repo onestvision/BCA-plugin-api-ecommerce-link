@@ -51,10 +51,10 @@
       "target": "api::order.order",
       "inversedBy": "transactions"
     },
-    "customer": {
+    "payment": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::customer.customer",
+      "target": "api::payment.payment",
       "inversedBy": "transactions"
     }
   }

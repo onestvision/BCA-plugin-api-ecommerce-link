@@ -1,14 +1,14 @@
 {
   "kind": "collectionType",
-  "collectionName": "customers",
+  "collectionName": "payments",
   "info": {
-    "singularName": "customer",
-    "pluralName": "customers",
-    "displayName": "Customer",
+    "singularName": "payment",
+    "pluralName": "payments",
+    "displayName": "Payment",
     "description": ""
   },
   "options": {
-    "draftAndPublish": false
+    "draftAndPublish": true
   },
   "pluginOptions": {},
   "attributes": {
@@ -32,18 +32,6 @@
     "email": {
       "type": "email"
     },
-    "city_code": {
-      "type": "string"
-    },
-    "department_code": {
-      "type": "string"
-    },
-    "country": {
-      "type": "string"
-    },
-    "address": {
-      "type": "string"
-    },
     "razon_social": {
       "type": "string"
     },
@@ -51,17 +39,13 @@
       "type": "relation",
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
-      "inversedBy": "customers"
+      "inversedBy": "payments"
     },
     "transactions": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::transaction.transaction",
-      "mappedBy": "customer"
-    },
-    "predetermined": {
-      "type": "boolean",
-      "default": false
+      "mappedBy": "payment"
     }
   }
 }
