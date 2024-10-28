@@ -64,6 +64,18 @@
       "relation": "manyToOne",
       "target": "api::shipping.shipping",
       "inversedBy": "orders"
+    },
+    "shipping_details": {
+      "displayName": "shipping_details",
+      "type": "component",
+      "repeatable": false,
+      "component": "shipping-details.shipping-details"
+    },
+    "logistics_provider": {
+      "type": "string"
+    },
+    "tracking_code": {
+      "type": "string"
     }
   }
 }

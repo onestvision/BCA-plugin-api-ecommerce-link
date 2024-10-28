@@ -1011,51 +1011,6 @@ export interface ApiColectionColection extends Schema.CollectionType {
   };
 }
 
-export interface ApiCustomerCustomer extends Schema.CollectionType {
-  collectionName: 'customers';
-  info: {
-    singularName: 'customer';
-    pluralName: 'customers';
-    displayName: 'Customer';
-    description: '';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    full_name: Attribute.String;
-    identify_number: Attribute.String & Attribute.Required & Attribute.Unique;
-    identification_type: Attribute.String;
-    phone_number: Attribute.String & Attribute.Required & Attribute.Unique;
-    email: Attribute.Email;
-    city_code: Attribute.String;
-    department_code: Attribute.String;
-    country: Attribute.String;
-    address: Attribute.String;
-    razon_social: Attribute.String;
-    transactions: Attribute.Relation<
-      'api::customer.customer',
-      'oneToMany',
-      'api::transaction.transaction'
-    >;
-    predetermined: Attribute.Boolean & Attribute.DefaultTo<false>;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::customer.customer',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::customer.customer',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
 export interface ApiGlobalConfigGlobalConfig extends Schema.CollectionType {
   collectionName: 'global_configs';
   info: {
@@ -1163,6 +1118,9 @@ export interface ApiOrderOrder extends Schema.CollectionType {
       'manyToOne',
       'api::shipping.shipping'
     >;
+    shipping_details: Attribute.Component<'shipping-details.shipping-details'>;
+    logistics_provider: Attribute.String;
+    tracking_code: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1345,13 +1303,13 @@ export interface ApiShippingShipping extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    full_name: Attribute.String;
-    phone_number: Attribute.String & Attribute.Required & Attribute.Unique;
-    email: Attribute.Email;
-    city: Attribute.String;
-    department: Attribute.String;
-    country: Attribute.String;
-    address_line_1: Attribute.String;
+    full_name: Attribute.String & Attribute.Required;
+    phone_number: Attribute.String & Attribute.Required;
+    email: Attribute.Email & Attribute.Required;
+    city: Attribute.String & Attribute.Required;
+    department: Attribute.String & Attribute.Required;
+    country: Attribute.String & Attribute.Required;
+    address_line_1: Attribute.String & Attribute.Required;
     user: Attribute.Relation<
       'api::shipping.shipping',
       'manyToOne',
@@ -1520,7 +1478,6 @@ declare module '@strapi/types' {
       'api::brand.brand': ApiBrandBrand;
       'api::category.category': ApiCategoryCategory;
       'api::colection.colection': ApiColectionColection;
-      'api::customer.customer': ApiCustomerCustomer;
       'api::global-config.global-config': ApiGlobalConfigGlobalConfig;
       'api::order.order': ApiOrderOrder;
       'api::payment.payment': ApiPaymentPayment;

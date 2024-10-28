@@ -62,8 +62,8 @@ async function createTransaction(company, transaction_id) {
       },
       order: {
         id: order.order_id,
-        transportadora: "COORDINADORA",
-        guia: "Numero de Guia Pendiente",
+        transportadora: order.logistics_provider,
+        guia: order.tracking_code,
         estado_orden: order.status,
         cupon: order.coupon,
         discount: order.discount,
@@ -82,11 +82,16 @@ async function createTransaction(company, transaction_id) {
     }
 
     const token = await getToken("xeletiene")
-    await axios.post(url, body, {
+    const response = await axios.post(url, body, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
+    console.log(response);
+    
+    if (!response.data.success) {
+      throw Error(`Error generating a Kasoft transaction: ${response.data.error}`)
+    }
   } catch (error) {
     console.log(error)
   }

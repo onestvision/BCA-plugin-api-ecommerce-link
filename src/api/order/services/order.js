@@ -1,11 +1,11 @@
 const { createCoreService } = require('@strapi/strapi').factories;
 const axios = require('axios');
-const { sendWhatsAppMessage } = require("../../../utils/messageSender/sendMessage");
 const { getToken } = require('../../../utils/kasoft/getToken');
 const { sendWhatsAppInteractive } = require('../../../utils/messageSender/sendInteractive');
+const { addShippingDetails } = require('../../../utils/formaters/addShippingDetails');
 
 module.exports = createCoreService('api::order.order', ({ strapi }) => ({
-  async createOrder(user, products, coupon, discount, subtotal, total, shipping_id) {
+  async createOrder(user, products, coupon, discount, subtotal, total, shipping_id, shipping_details) {
     try {
       let orderDescription = "";
       let orderId = ""
@@ -18,6 +18,10 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
         }
       })
 
+      const shipping_details_added = addShippingDetails(shipping_details)
+      console.log(shipping_details_added);
+      
+
       if (order.length == 0) {
         orderId = `OR${Math.floor(100000 + Math.random() * 900000)}`;
         newOrder = true
@@ -28,13 +32,13 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
             discount: discount,
             subtotal: subtotal,
             total: total,
-            shipping: shipping_id
+            shipping: shipping_id,
+            shipping_details: shipping_details_added
           },
         });
       } else {
         newOrder = false
         order = order[0]
-
         orderId = order.order_id.substring(0, 8);
         if (order.status == "processing") {
           await strapi.entityService.update('api::order.order', order.id, {
@@ -45,7 +49,8 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
               subtotal: subtotal,
               total: total,
               product_orders: [],
-              shipping: shipping_id
+              shipping: shipping_id,
+              shipping_details: shipping_details_added
             },
           });
         }
