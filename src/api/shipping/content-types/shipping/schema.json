@@ -13,27 +13,33 @@
   "pluginOptions": {},
   "attributes": {
     "full_name": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "phone_number": {
       "type": "string",
-      "unique": true,
+      "unique": false,
       "required": true
     },
     "email": {
-      "type": "email"
+      "type": "email",
+      "required": true
     },
     "city": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "department": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "country": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "address_line_1": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "user": {
       "type": "relation",

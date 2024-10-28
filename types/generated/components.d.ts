@@ -1,5 +1,21 @@
 import type { Schema, Attribute } from '@strapi/strapi';
 
+export interface ShippingDetailsShippingDetails extends Schema.Component {
+  collectionName: 'components_shipping_details_shipping_details';
+  info: {
+    displayName: 'shipping_details';
+    description: '';
+  };
+  attributes: {
+    ubl: Attribute.Integer & Attribute.DefaultTo<0>;
+    height: Attribute.Decimal;
+    length: Attribute.Decimal;
+    weight: Attribute.Decimal;
+    units: Attribute.Integer & Attribute.DefaultTo<1>;
+    width: Attribute.Decimal;
+  };
+}
+
 export interface ProductProducts extends Schema.Component {
   collectionName: 'components_product_products';
   info: {
@@ -20,6 +36,7 @@ export interface ProductProducts extends Schema.Component {
 declare module '@strapi/types' {
   export module Shared {
     export interface Components {
+      'shipping-details.shipping-details': ShippingDetailsShippingDetails;
       'product.products': ProductProducts;
     }
   }
