@@ -18,3 +18,4 @@ async function generateDistpatch(tracking_code) {
     throw new Error(`Error generating waybill: ${error.message}`);
   }
 }
+module.exports = { generateDistpatch };
