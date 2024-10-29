@@ -87,7 +87,6 @@ async function createTransaction(company, transaction_id) {
         Authorization: `Bearer ${token}`
       }
     })
-    console.log(response);
     
     if (!response.data.success) {
       throw Error(`Error generating a Kasoft transaction: ${response.data.error}`)

@@ -6,12 +6,12 @@
 
 const { createCoreController } = require('@strapi/strapi').factories;
 
-module.exports = createCoreController('api::order.order',({ strapi }) => ({
+module.exports = createCoreController('api::order.order', ({ strapi }) => ({
   async createOrder(ctx) {
     try {
-      const { phone_number, shipping_id, shipping_details, products, coupon, discount, subtotal, total } = ctx.request.body;
-      
-      if (!phone_number || phone_number.trim().length === 0){
+      const { phone_number, shipping_id, shipping_details, products, coupon, discount, subtotal, total, shipping_value } = ctx.request.body;
+
+      if (!phone_number || phone_number.trim().length === 0) {
         return ctx.badRequest('The "phone_number" field must be a non-null field.');
       }
 
@@ -22,7 +22,7 @@ module.exports = createCoreController('api::order.order',({ strapi }) => ({
       if (!shipping_details || !Array.isArray(shipping_details) || shipping_details.length === 0) {
         return ctx.badRequest('The "products" field must be a non-empty list.');
       }
-      
+
       const user = await strapi.entityService.findMany('plugin::users-permissions.user', {
         filters: {
           phone_number: {
@@ -30,13 +30,13 @@ module.exports = createCoreController('api::order.order',({ strapi }) => ({
           },
         },
       });
-      
+
       if (user.length === 0) {
         return ctx.notFound(`The user with phone number ${phone_number} not found.`);
-      } 
-      
-      const newOrder = await strapi.service('api::order.order').createOrder(user[0], products, coupon,discount, subtotal, total, shipping_id, shipping_details);
-      
+      }
+
+      const newOrder = await strapi.service('api::order.order').createOrder(user[0], products, coupon, discount, subtotal, total, shipping_id, shipping_details, shipping_value);
+
       return newOrder;
     } catch (error) {
       ctx.throw(500, error);
@@ -46,7 +46,7 @@ module.exports = createCoreController('api::order.order',({ strapi }) => ({
     const { order_id, company } = ctx.request.body;
     try {
       if (order_id && company) {
-        return await strapi.service('api::order.order').cancelOrder(order_id,company);
+        return await strapi.service('api::order.order').cancelOrder(order_id, company);
       }
       return ctx.badRequest()
     } catch (error) {

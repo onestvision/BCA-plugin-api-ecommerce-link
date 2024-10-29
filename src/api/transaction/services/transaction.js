@@ -1,5 +1,6 @@
 'use strict';
 const { createCoreService } = require('@strapi/strapi').factories;
+const { valueToString } = require('../../../utils/formaters/valueToString');
 const { createTransaction } = require('../../../utils/kasoft/createTransaction');
 const { sendWhatsAppInteractive } = require('../../../utils/messageSender/sendInteractive');
 const { sendWhatsAppMessage } = require("../../../utils/messageSender/sendMessage");
@@ -66,7 +67,7 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
           payment:payment.id
         },
       });
-      const taxesMessage = taxes > 0 ? `Impuestos: $${taxes}\n` : ""
+      const taxesMessage = taxes > 0 ? `\nImpuestos: $${taxes}` : ""
 
       if (status === "APPROVED") {
         const tracking_code = await getTrackingCode(order[0])
@@ -78,16 +79,18 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
             tracking_code: tracking_code
           },
         });
-        await createTransaction("xeletiene", transaction_id);
         
-        const message = `🎊 *¡${user.name}, Gracias por tu compra!* 🎊\nMe alegra informarte que tu pago ha sido procesado con éxito. El número de comprobante de tu transacción es *${transaction_id}*.\n\nAquí tienes los detalles de tu pedido:\n${order[0].description}\nSubtotal: $${subtotal}\n${taxesMessage}*Total: $${total}*\n\nPuedes ratrear tu envio con el número de guia: *${tracking_code}*\n\n😊Si tienes alguna pregunta o necesitas asistencia, no dudes en contactarme. ¡Estoy aquí para ayudarte!\n\n🌟 ¡Gracias por confiar en nosotros! ¡Esperamos que disfrutes tu compra! 🌟`
+        await createTransaction("xeletiene", transaction_id);
+        const shippingValueMessage = order[0].shipping_value > 0 ? `$${valueToString(order[0].shipping_value)}`:"GRATIS" 
+
+        const message = `🎊 *¡${user.name}, Gracias por tu compra!* 🎊\nMe alegra informarte que tu pago ha sido procesado con éxito. El número de comprobante de tu transacción es *${transaction_id}*.\n\n📦Aquí tienes los detalles de tu pedido:\n${order[0].description}\nSubtotal: $${valueToString(subtotal)}\nEnvio: ${shippingValueMessage}${taxesMessage}\n*Total: $${valueToString(total)}*\n\nTu pedido fue enviado a travez de *COORDINADORA*. Yo te mantendré al tanto de las novedades de tu envio pero siempre puedes rastrear tu envio con el número de guia: *${tracking_code}*\n\n😊Si tienes alguna pregunta o necesitas asistencia, no dudes en contactarme. ¡Estoy aquí para ayudarte!\n\n🌟 ¡${user.name} espero que disfrutes tu compra! 🌟`
         
         await sendWhatsAppMessage("Xeletiene", message, user.phone_number)
         await generateLabel(tracking_code)
         await generateDistpatch(tracking_code)
       
       } else {
-        const message = "Ha ocurrido un error con tu pago. 😔\nSi quieres intentarlo de nuevo presiona *reintentar compra*.\nSi persiste el problema, no dudes en contactarnos.\n¡Gracias por tu paciencia!"
+        const message = `😕 Parece que hubo un problema al procesar tu pago. Puedes intentarlo de nuevo presionando * "Reintentar compra" *.📲 Si el problema continúa, aquí estamos para ayudarte.\n🙏 ¡Gracias por tu comprensión y paciencia!`
         await sendWhatsAppInteractive("Xeletiene", message, user.phone_number, ["🔄Reintentar compra"])
       }
 
