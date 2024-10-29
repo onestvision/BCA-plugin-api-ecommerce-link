@@ -1,6 +1,4 @@
-function addShippingDetails(items) {
-  console.log(items);
-  
+function addShippingDetails(items) {  
   return items.reduce((acc, item) => {
     acc.height += item.alto || 0;
     acc.width += item.ancho || 0;

@@ -76,6 +76,9 @@
     },
     "tracking_code": {
       "type": "string"
+    },
+    "shipping_value": {
+      "type": "biginteger"
     }
   }
 }

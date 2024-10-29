@@ -1121,6 +1121,7 @@ export interface ApiOrderOrder extends Schema.CollectionType {
     shipping_details: Attribute.Component<'shipping-details.shipping-details'>;
     logistics_provider: Attribute.String;
     tracking_code: Attribute.String;
+    shipping_value: Attribute.BigInteger;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
