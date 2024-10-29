@@ -117,7 +117,7 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
       const shippingValueMessage = shipping_value > 0 ? `$${valueToString(shipping_value)}` : "GRATIS"
 
       const message = `
-      🎉 *¡Todo listo ${user.name}! 🎉 He ${statusMessage} tu orden con éxito.* \nTu número de orden es *${orderId}${order.id}*.\n\n🛒 Estos son los detalles de los productos que seleccionaste:\n${productDescriptions.join('')}\nSubtotal: $${valueToString(subtotal)}\nEnvio: ${shippingValueMessage}\n${discountMessage}*Total: $${valueToString(total)}*\n\nEstoy encantado de ayudarte en tu experiencia de compra. ${user.name} si tienes dudas o necesitas recomendaciones, estoy aquí para lo que necesites. ¡Espero que disfrutes tus productos!*`
+      🎉 *¡Todo listo ${user.name}! 🎉 He ${statusMessage} tu orden con éxito.* \nTu número de orden es *${orderId}${order.id}*.\n\n🛒 Estos son los detalles de los productos que seleccionaste:\n${productDescriptions.join('')}\nSubtotal: $${valueToString(subtotal)}\nEnvio: ${shippingValueMessage}\n${discountMessage}*Total: $${valueToString(total)}*\n\n🙌 ${user.name} si tienes dudas o necesitas mas recomendaciones, estoy aquí para lo que necesites.😊`
 
       await sendWhatsAppInteractive("Xeletiene", message, user.phone_number, ["🛒Finalizar compra", "🛍️Continuar compra"])
 
