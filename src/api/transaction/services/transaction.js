@@ -18,7 +18,7 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
       const { payment_link_id, customer_email, customer_data, amount_in_cents, status, finalized_at, id, payment_method_type } = transaction;
       const order = await strapi.entityService.findMany('api::order.order', {
         filters: { link: { $eq: payment_link_id } },
-        populate: ['shipping', 'shipping_details'],
+        populate: ['shipping', 'shipping_details', 'user'],
       });
 
       if (order.length == 0) {
@@ -104,6 +104,9 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
       if (status === "APPROVED") {
         const tracking_code = await getTrackingCode(order[0])
 
+        console.log(tracking_code);
+        
+
         await strapi.entityService.update('api::order.order', order[0].id, {
           data: {
             status: "completed",
@@ -125,8 +128,8 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
         const message = `🎊 *¡${user.name}, Gracias por tu compra!* 🎊\nMe alegra informarte que tu pago ha sido procesado con éxito. El número de comprobante de tu transacción es *${transaction_id}*.\n\n📦Aquí tienes los detalles de tu pedido:\n${descriptionMessage}\n\nSubtotal: $${valueToString(subtotal)}\nEnvio: ${shippingValueMessage}${taxesMessage}\n*Total: $${valueToString(total)}*\n\n🚚Tu pedido fue enviado a travez de *COORDINADORA*.📦\nYo te mantendré al tanto de las novedades de tu envio 📲 pero siempre puedes rastrearlo con el número de guia: *${tracking_code}* 🔎\n\n😊Si tienes alguna pregunta o necesitas asistencia, no dudes en contactarme. ¡Estoy aquí para ayudarte!\n\n🌟 *¡${user.name} espero que disfrutes tu compra!* 🌟`
 
         await sendWhatsAppMessage("Xeletiene", message, user.phone_number)
-        await generateLabel(tracking_code)
-        await generateDistpatch(tracking_code)
+        await generateLabel("901277226",tracking_code)
+        //await generateDistpatch("901277226",tracking_code)
 
       } else {
         await strapi.entityService.update('api::order.order', order[0].id, {

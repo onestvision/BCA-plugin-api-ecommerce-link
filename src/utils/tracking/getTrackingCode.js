@@ -29,13 +29,13 @@ async function getTrackingCode(order, cashOnDelivery = false, payment_method = "
       "cashOnDelivery": cashOnDelivery,
       "cashOnDeliveryPaymentMethod": payment_method
     }    
-
-    const response = await axios.post(url, body)    
-    if (response.data.error == null) {
+    
+    const response = await axios.post(url, body) 
+    
+    if (response.data["status"] === true) {
       return response.data.data.codigo_remision
-    } else {
-      throw new Error(`Error generating waybill: ${response.data.error}`);
-    }
+    } 
+    return `Error generating waybill: ${response.data.error}`
   } catch (error) {
     throw new Error(`Error generating waybill: ${error.message}`);
   }
@@ -48,7 +48,7 @@ async function getCoordinadoraCode(city, department) {
       city: city,
       department: department
     })
-    
+
     if (response.data.error == null) {
       return response.data.data.dane_code
     } else {

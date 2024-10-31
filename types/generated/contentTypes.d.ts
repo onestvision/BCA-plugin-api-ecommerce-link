@@ -1148,7 +1148,7 @@ export interface ApiPaymentPayment extends Schema.CollectionType {
     description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     full_name: Attribute.String;
@@ -1169,7 +1169,6 @@ export interface ApiPaymentPayment extends Schema.CollectionType {
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
       'api::payment.payment',
       'oneToOne',
@@ -1301,7 +1300,7 @@ export interface ApiShippingShipping extends Schema.CollectionType {
     description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     full_name: Attribute.String & Attribute.Required;
@@ -1326,7 +1325,6 @@ export interface ApiShippingShipping extends Schema.CollectionType {
     address_line_2: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
       'api::shipping.shipping',
       'oneToOne',
