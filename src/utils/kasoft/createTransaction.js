@@ -34,10 +34,10 @@ async function createTransaction(company, transaction_id) {
       const product_id = Number(product.product_id)
       const variation_id = product.variation_id == null ? null : product.variation_id
       return {
-        id_variacion: variation_id,
-        id_producto: product_id,
-        cantidad: amount,
-        precio_unitario: unit_price,
+        Id_variacion: variation_id,
+        Id_producto: product_id,
+        Cantidad: amount,
+        Precio_unitario: unit_price,
       }
     })
 
@@ -45,41 +45,45 @@ async function createTransaction(company, transaction_id) {
       throw new Error('Your order is void')
     }
 
+    const department = shipping.city.toLowerCase() === "bogota" && shipping.department.toLowerCase() === "cundinamarca" ? "Bogota D.C" : shipping.department
+
     const body = {
-      id_transaction: transactionSelected.transaction_id,
-      cliente: {
-        id: transactionSelected.payment.identify_number,
-        razon_social: transactionSelected.payment.razon_social,
-        nombres: firstName,
-        apellidos: lastName,
-        celular: transactionSelected.payment.phone_number,
-        email: transactionSelected.payment.email,
-        direccion: shipping.address,
-        codigo_ciudad: shipping.city,
-        codigo_departamento: shipping.department,
-        pais: shipping.country,
-        tipo_identificacion: transactionSelected.payment.identification_type,
+      Id_transaction: transactionSelected.transaction_id,
+      Cliente: {
+        Id: transactionSelected.payment.identify_number,
+        Razon_social: transactionSelected.payment.razon_social,
+        Nombres: firstName,
+        Apellidos: lastName,
+        Celular: transactionSelected.payment.phone_number,
+        Email: transactionSelected.payment.email,
+        Direccion: shipping.address_line_2 ? `${shipping.address_line_1} - ${shipping.address_line_2}` : shipping.address_line_1,
+        Codigo_ciudad: shipping.city,
+        Codigo_departamento: department,
+        Pais: shipping.country,
+        Tipo_identificacion: transactionSelected.payment.identification_type,
       },
-      order: {
-        id: order.order_id,
-        transportadora: order.logistics_provider,
-        guia: order.tracking_code,
-        estado_orden: order.status,
-        cupon: order.coupon,
-        discount: order.discount,
-        subtotal: order.subtotal,
-        total: order.total,
+      Order: {
+        Id: order.order_id,
+        Transportadora: order.logistics_provider,
+        Guia: order.tracking_code,
+        Estado_orden: order.status,
+        Cupon: order.coupon,
+        Discount: order.discount,
+        Subtotal: order.subtotal,
+        Total: order.total,
       },
-      products: products,
-      fecha_transaccion: transactionSelected.transaction_date,
-      indicador_pago: transactionSelected.payment_id,
-      metodo_pago: transactionSelected.payment_method,
-      estado_transaccion: transactionSelected.status,
-      impuestos: transactionSelected.taxes,
-      total_neto: transactionSelected.subtotal,
-      currency: "COP",
-      total: transactionSelected.total,
+      Products: products,
+      Fecha_transaccion: transactionSelected.transaction_date,
+      Indicador_pago: transactionSelected.payment_id,
+      Metodo_pago: transactionSelected.payment_method,
+      Estado_transaccion: transactionSelected.status,
+      Impuestos: transactionSelected.taxes,
+      Total_neto: transactionSelected.subtotal,
+      Currency: "COP",
+      Total: transactionSelected.total,
     }
+
+    console.log(body);
 
     const token = await getToken("xeletiene")
     const response = await axios.post(url, body, {

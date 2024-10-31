@@ -2,6 +2,7 @@
 const { createCoreService } = require('@strapi/strapi').factories;
 const { valueToString } = require('../../../utils/formaters/valueToString');
 const { createTransaction } = require('../../../utils/kasoft/createTransaction');
+const { updateTransaction } = require('../../../utils/kasoft/updateTransaction');
 const { sendWhatsAppInteractive } = require('../../../utils/messageSender/sendInteractive');
 const { sendWhatsAppMessage } = require("../../../utils/messageSender/sendMessage");
 const { generateDistpatch } = require('../../../utils/tracking/generateDispatch');
@@ -11,6 +12,7 @@ const { getTrackingCode } = require('../../../utils/tracking/getTrackingCode');
 module.exports = createCoreService('api::transaction.transaction', ({ strapi }) => ({
   async processPayment(data) {
     try {
+      let newTrans = false; 
       const { transaction } = data;
       const { payment_link_id, customer_email, customer_data, amount_in_cents, status, finalized_at, id, payment_method_type } = transaction;
       const order = await strapi.entityService.findMany('api::order.order', {
@@ -47,26 +49,55 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
         payment = payment[0]
       }
 
+      const trans = await strapi.entityService.findMany('api::transaction.transaction', {
+        filters: { identify_number: { $eq: customer_data.customer_references[0].value.trim() } },
+      })
+
+      let newTransaction;
+      let transaction_id;
       const taxes = 0;
       const subtotal = amount_in_cents / 100;
       const total = taxes + subtotal;
       const transaction_status = status === "APPROVED" ? "completed" : "failed";
-      const transaction_id = `TR${Math.floor(100000 + Math.random() * 900000)}${order[0].id}`
-      const newTransaction = await strapi.entityService.create('api::transaction.transaction', {
-        data: {
-          transaction_id: transaction_id,
-          order: order[0].id,
-          transaction_date: finalized_at,
-          payment_id: id,
-          payment_method: payment_method_type,
-          status: transaction_status,
-          taxes,
-          subtotal,
-          total,
-          user: user.id || null,
-          payment: payment.id
-        },
-      });
+
+      if (trans.length == 0) {
+        newTrans = true
+        transaction_id = `TR${Math.floor(100000 + Math.random() * 900000)}${order[0].id}`
+        newTransaction = await strapi.entityService.create('api::transaction.transaction', {
+          data: {
+            transaction_id: transaction_id,
+            order: order[0].id,
+            transaction_date: finalized_at,
+            payment_id: id,
+            payment_method: payment_method_type,
+            status: transaction_status,
+            taxes,
+            subtotal,
+            total,
+            user: user.id || null,
+            payment: payment.id
+          },
+        });
+      } else {
+        newTrans = false
+        transaction_id = trans[0].transaction_id
+        newTransaction = await strapi.entityService.update('api::transaction.transaction', trans[0].id, {
+          data: {
+            transaction_id: transaction_id,
+            order: order[0].id,
+            transaction_date: finalized_at,
+            payment_id: id,
+            payment_method: payment_method_type,
+            status: transaction_status,
+            taxes,
+            subtotal,
+            total,
+            user: user.id || null,
+            payment: payment.id
+          },
+        });
+      }
+
       const taxesMessage = taxes > 0 ? `\nImpuestos: $${taxes}` : ""
 
       if (status === "APPROVED") {
@@ -79,14 +110,15 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
             tracking_code: tracking_code
           },
         });
-
-        await createTransaction("xeletiene", transaction_id);
+        
+        newTrans ? await createTransaction("xeletiene", transaction_id) : await updateTransaction("xeletiene", transaction_id, transaction_status);
+        
         const shippingValueMessage = order[0].shipping_value > 0 ? `$${valueToString(order[0].shipping_value)}` : "GRATIS"
 
         const descriptionMessage = order[0].description
           .split('\n')
-          .filter(line => line.trim() !== '') 
-          .map(line => `📌${line}`) 
+          .filter(line => line.trim() !== '')
+          .map(line => `📌${line}`)
           .join('\n');
 
         const message = `🎊 *¡${user.name}, Gracias por tu compra!* 🎊\nMe alegra informarte que tu pago ha sido procesado con éxito. El número de comprobante de tu transacción es *${transaction_id}*.\n\n📦Aquí tienes los detalles de tu pedido:\n${descriptionMessage}\n\nSubtotal: $${valueToString(subtotal)}\nEnvio: ${shippingValueMessage}${taxesMessage}\n*Total: $${valueToString(total)}*\n\n🚚Tu pedido fue enviado a travez de *COORDINADORA*.📦\nYo te mantendré al tanto de las novedades de tu envio 📲 pero siempre puedes rastrearlo con el número de guia: *${tracking_code}* 🔎\n\n😊Si tienes alguna pregunta o necesitas asistencia, no dudes en contactarme. ¡Estoy aquí para ayudarte!\n\n🌟 *¡${user.name} espero que disfrutes tu compra!* 🌟`
@@ -96,7 +128,16 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
         await generateDistpatch(tracking_code)
 
       } else {
-        const message = `😕 Parece que hubo un problema al procesar tu pago. Puedes intentarlo de nuevo presionando * "Reintentar compra" *.📲 Si el problema continúa, aquí estamos para ayudarte.\n🙏 ¡Gracias por tu comprensión y paciencia!`
+        await strapi.entityService.update('api::order.order', order[0].id, {
+          data: {
+            status: "completed",
+            logistics_provider: "Transaction failed",
+            tracking_code: "Transaction failed"
+          },
+        });
+        newTrans ? await createTransaction("xeletiene", transaction_id) : await updateTransaction("xeletiene", transaction_id, transaction_status);
+
+        const message = `😕 Parece que hubo un problema al procesar tu pago. Puedes intentarlo de nuevo presionando *"Reintentar compra"*.📲 Si el problema continúa, aquí estamos para ayudarte.\n🙏 ¡Gracias por tu comprensión y paciencia!`
         await sendWhatsAppInteractive("Xeletiene", message, user.phone_number, ["🔄Reintentar compra"])
       }
 
