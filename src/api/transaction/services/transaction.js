@@ -1,5 +1,6 @@
 'use strict';
 const { createCoreService } = require('@strapi/strapi').factories;
+const { setLocalDateTime } = require('../../../utils/formaters/setLocalDateTime');
 const { valueToString } = require('../../../utils/formaters/valueToString');
 const { createTransaction } = require('../../../utils/kasoft/createTransaction');
 const { updateTransaction } = require('../../../utils/kasoft/updateTransaction');
@@ -12,12 +13,12 @@ const { getTrackingCode } = require('../../../utils/tracking/getTrackingCode');
 module.exports = createCoreService('api::transaction.transaction', ({ strapi }) => ({
   async processPayment(data) {
     try {
-      let newTrans = false; 
+      let newTrans = false;
       const { transaction } = data;
       const { payment_link_id, customer_email, customer_data, amount_in_cents, status, finalized_at, id, payment_method_type } = transaction;
       const order = await strapi.entityService.findMany('api::order.order', {
         filters: { link: { $eq: payment_link_id } },
-        populate: ['user.customer', 'shipping', 'shipping_details'],
+        populate: ['shipping', 'shipping_details'],
       });
 
       if (order.length == 0) {
@@ -110,9 +111,9 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
             tracking_code: tracking_code
           },
         });
-        
+
         newTrans ? await createTransaction("xeletiene", transaction_id) : await updateTransaction("xeletiene", transaction_id, transaction_status);
-        
+
         const shippingValueMessage = order[0].shipping_value > 0 ? `$${valueToString(order[0].shipping_value)}` : "GRATIS"
 
         const descriptionMessage = order[0].description
@@ -146,5 +147,107 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
       console.error('We have problems creating a new transaction', error.details?.errors);
       throw error;
     }
+  },
+
+  async cashOnDelivery(data) {
+    try {
+      const { phone_number, identify_number, identification_type, full_name, razon_social, email, payment_method } = data
+      validateData(data);
+
+      const order = await strapi.entityService.findMany('api::order.order', {
+        filters: {
+          user: {
+            phone_number: { $eq: phone_number }
+          },
+          status: { $neq: "completed" }
+        },
+        populate: ['shipping', 'shipping_details', "user"],
+      });
+
+      if (order.length == 0) {
+        throw new Error('Order not found.');
+      }
+
+      let payment;
+      payment = await strapi.entityService.findMany('api::payment.payment', {
+        filters: { identify_number: { $eq: identify_number } },
+      })
+
+      if (payment.length == 0) {
+        payment = await strapi.entityService.create('api::payment.payment', {
+          data: {
+            full_name: full_name,
+            phone_number: phone_number.replace("+", ""),
+            identify_number: identify_number,
+            identification_type: identification_type,
+            razon_social: razon_social ? razon_social : full_name,
+            user: order[0].user.id,
+            email: email,
+          },
+        });
+      } else {
+        payment = payment[0]
+      }
+
+      const transaction_id = `TR${Math.floor(100000 + Math.random() * 900000)}${order[0].id}`
+      const taxes = 0;
+      const total = taxes + order[0].total;
+      const newTransaction = await strapi.entityService.create('api::transaction.transaction', {
+        data: {
+          transaction_id: transaction_id,
+          order: order[0].id,
+          transaction_date: setLocalDateTime(),
+          payment_id: transaction_id.replace("TR",""),
+          payment_method: "PAGO CONTRAENTREGA",
+          status: "completed",
+          taxes: taxes,
+          subtotal: order[0].total,
+          total: total,
+          user: order[0].user.id,
+          payment: payment.id
+        },
+      })
+
+      const tracking_code = await getTrackingCode(order[0], true, payment_method)
+
+      await strapi.entityService.update('api::order.order', order[0].id, {
+        data: {
+          status: "completed",
+          logistics_provider: "COORDINADORA",
+          tracking_code: tracking_code
+        },
+      });
+
+      await createTransaction("xeletiene", transaction_id)
+      return newTransaction
+    } catch (error) {
+      console.error('We have problems creating a new transaction', error.details?.errors);
+      throw error;
+    }
   }
 }));
+
+
+function isValidString(value) {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+function validateData(data) {
+  const { phone_number, identify_number, identification_type, full_name, email } = data;
+
+  if (!isValidString(phone_number)) {
+      throw new Error("the phone number is not valid");
+  }
+  if (!isValidString(identify_number)) {
+      throw new Error("the identify number is not valid");
+  }
+  if (!isValidString(identification_type)) {
+      throw new Error("the identification type is not valid");
+  }
+  if (!isValidString(full_name)) {
+      throw new Error("the full name is not valid");
+  }
+  if (!isValidString(email)) {
+      throw new Error("the email is not valid");
+  }
+}
