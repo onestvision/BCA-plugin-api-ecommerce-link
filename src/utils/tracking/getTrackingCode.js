@@ -8,7 +8,7 @@ async function getTrackingCode(order, cashOnDelivery = false, payment_method = "
 
   try {
     const body = {
-      "nit": "901864903",
+      "nit": "901277226",
       "id_client": "50616",
       "recipient": {
         "nit": "",
