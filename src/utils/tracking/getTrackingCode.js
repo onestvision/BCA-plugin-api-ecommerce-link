@@ -1,14 +1,14 @@
 const axios = require("axios");
 
-async function getTrackingCode(order) {
-  const url = `${process.env.TRACKING_URL}/coordinadora/generate-waybill`
+async function getTrackingCode(order, cashOnDelivery = false, payment_method = "efectivo") {
+  const url = `${process.env.TRACKING_URL}/coordinadora/generate-guide`
   const { shipping } = order
   
   const department = shipping.city.toLowerCase() === "bogota" ? "cundinamarca" : shipping.department
 
   try {
     const body = {
-      "nit": "901277226",
+      "nit": "901864903",
       "id_client": "50616",
       "recipient": {
         "nit": "",
@@ -26,8 +26,8 @@ async function getTrackingCode(order) {
         "observations": ""
       },
       "shipping_details": order.shipping_details,
-      "user": "xeletiene.ws",
-      "password": "3f9f3d445cb9d2b4c7aeaf2a841bcd1502abfc78258e6df3027aa7bb9a19c41a"
+      "cashOnDelivery": cashOnDelivery,
+      "cashOnDeliveryPaymentMethod": payment_method
     }    
 
     const response = await axios.post(url, body)    

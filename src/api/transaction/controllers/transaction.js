@@ -18,5 +18,12 @@ module.exports = createCoreController('api::transaction.transaction', ({ strapi 
       console.log(error);
     }
   },
+  async cashOnDelivery(ctx) {
+    try {
+      return await strapi.service('api::transaction.transaction').cashOnDelivery(ctx.request.body);
+    } catch (error) {
+      console.log(error);
+    }
+  },
 }
 ));

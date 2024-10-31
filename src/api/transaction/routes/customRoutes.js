@@ -8,6 +8,15 @@ module.exports = {
         policies: [],
         middlewares: [],
       },
+    },
+    {
+      method: 'POST',
+      path: '/transactions/cashOnDelivery',
+      handler: 'transaction.cashOnDelivery',
+      config: {
+        policies: [],
+        middlewares: [],
+      },
     }
   ],
 };
