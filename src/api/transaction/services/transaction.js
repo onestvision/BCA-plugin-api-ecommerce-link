@@ -174,10 +174,20 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
         },
         populate: ['shipping', 'shipping_details', "user"],
       });
-
+      
       if (order.length === 0) {
         return 'Order not found with status "processing".';
       }
+
+      const tracking_code = await getTrackingCode(order[0], true, payment_method);
+
+      await strapi.entityService.update('api::order.order', order[0].id, {
+        data: {
+          status: "completed",
+          logistics_provider: "COORDINADORA",
+          tracking_code: tracking_code
+        },
+      });
 
       if (order[0].user.email.includes("@correo.com")) {
         await strapi.entityService.update('plugin::users-permissions.user', order[0].user.id, {
@@ -227,17 +237,7 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
         },
       });
 
-      const tracking_code = await getTrackingCode(order[0], true, payment_method);
-
-      await strapi.entityService.update('api::order.order', order[0].id, {
-        data: {
-          status: "completed",
-          logistics_provider: "COORDINADORA",
-          tracking_code: tracking_code
-        },
-      });
-
-      await createTransaction("xeletiene", transaction_id);
+      //await createTransaction("xeletiene", transaction_id);
       return newTransaction;
     } catch (error) {
       console.error("Error in cashOnDelivery:", error);
