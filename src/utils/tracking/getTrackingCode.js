@@ -3,8 +3,6 @@ const axios = require("axios");
 async function getTrackingCode(order, cashOnDelivery = false, payment_method = "efectivo") {
   const url = `${process.env.TRACKING_URL}/coordinadora/generate-guide`
   const { shipping } = order
-  
-  const department = shipping.city.toLowerCase() === "bogota" ? "cundinamarca" : shipping.department
 
   try {
     const body = {
@@ -15,7 +13,7 @@ async function getTrackingCode(order, cashOnDelivery = false, payment_method = "
         "div": "1",
         "full_name": shipping.full_name,
         "address": (shipping.address_line_2 && shipping.address_line_2 != "") ? `${shipping.address_line_1} ${shipping.address_line_2}` : shipping.address_line_1,
-        "city": await getCoordinadoraCode(shipping.city, department),
+        "city": await getCoordinadoraCode(shipping.city, shipping.department),
         "phone": shipping.phone_number,
         "email": shipping.email
       },
