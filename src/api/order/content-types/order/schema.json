@@ -78,7 +78,7 @@
       "type": "string"
     },
     "shipping_value": {
-      "type": "biginteger"
+      "type": "decimal"
     }
   }
 }

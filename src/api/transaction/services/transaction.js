@@ -162,7 +162,7 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
           user: {
             phone_number: { $eq: phone_number }
           },
-          status: { $neq: "completed" }
+          status: { $eq: "processing" }
         },
         populate: ['shipping', 'shipping_details', "user"],
       });

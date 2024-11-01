@@ -19,7 +19,7 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
         }
       })
 
-      if (user.email.includes("@correo")) {
+      if (user.email.includes("@correo.com")) {
         const shipping = await strapi.entityService.findOne('api::shipping.shipping', shipping_id);
         await strapi.entityService.update('plugin::users-permissions.user', user.id, {
           data: {
@@ -78,7 +78,7 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
           unit_price: product.unit_price,
         }
         productsOfOrder.push(product_info)
-      
+
 
         return product.variation_id
           ? `📌${product.product_name} ${product.variation_description} - $${valueToString(product.unit_price)} x ${product.amount}\n`
@@ -112,7 +112,7 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
         });
       }
 
-      orderDescription = productDescriptions.join('').replaceAll("📌","");
+      orderDescription = productDescriptions.join('').replaceAll("📌", "");
 
       const updatedOrder = await strapi.entityService.update('api::order.order', order.id, {
         data: {
@@ -139,18 +139,17 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
   async cancelOrder(order_id, company) {
     let response;
     const url = `${process.env.KASOFT_URL}/${company}/transactions/status`
-    const order = await strapi.entityService.findOne('api::order.order', order_id, {
-      populate: "transactions"
-    });
-
-    if (order.status == "completed") {
-      throw new Error("An order completed can't be modified")
-    }
-
     try {
-      if (order.transactions.length == 0) {
-        response = await strapi.entityService.delete('api::order.order', order_id);
-      } else {
+      const order = await strapi.entityService.findOne('api::order.order', order_id, {
+        populate: "transactions"
+      });
+
+      if (order.status == "completed") {
+        throw new Error("An order completed can't be modified")
+      }
+
+      await strapi.entityService.delete('api::order.order', order_id);
+      if (order.transactions.length > 0) {
         const token = await getToken(company)
         response = await axios.put(url, {
           transaction_id: order.transactions[0].transaction_id,
