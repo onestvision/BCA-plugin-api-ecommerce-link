@@ -26,6 +26,14 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
       }
 
       const user = order[0].user;
+      if (user.email.includes("@correo.com")) {
+        await strapi.entityService.update('plugin::users-permissions.user', user.id, {
+          data: {
+            username: customer_data.customer_references[0].value.trim(),
+            email: customer_email
+          }
+        });
+      }
 
       let payment;
       payment = await strapi.entityService.findMany('api::payment.payment', {
@@ -166,6 +174,15 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
         },
         populate: ['shipping', 'shipping_details', "user"],
       });
+
+      if (order[0].user.email.includes("@correo.com")) {
+        await strapi.entityService.update('plugin::users-permissions.user', order[0].user.id, {
+          data: {
+            username: identify_number,
+            email: email
+          }
+        });
+      }
 
       if (order.length == 0) {
         throw new Error('Order not found.');

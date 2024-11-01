@@ -19,16 +19,6 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
         }
       })
 
-      if (user.email.includes("@correo.com")) {
-        const shipping = await strapi.entityService.findOne('api::shipping.shipping', shipping_id);
-        await strapi.entityService.update('plugin::users-permissions.user', user.id, {
-          data: {
-            username: shipping.identify_number,
-            email: shipping.email
-          }
-        });
-      }
-
       const shipping_details_added = addShippingDetails(shipping_details)
 
       if (order.length == 0) {
