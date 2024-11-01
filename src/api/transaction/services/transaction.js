@@ -176,7 +176,7 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
       });
 
       if (order.length === 0) {
-        throw new Error('Order not found with status "processing".');
+        return 'Order not found with status "processing".';
       }
 
       if (order[0].user.email.includes("@correo.com")) {
@@ -215,7 +215,7 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
         data: {
           transaction_id: transaction_id,
           order: order[0].id,
-          transaction_date: new Date(),
+          transaction_date: setLocalDateTime(),
           payment_id: transaction_id.replace("TR", ""),
           payment_method: "PAGO CONTRAENTREGA",
           status: "completed",
@@ -237,7 +237,7 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
         },
       });
 
-      await createTransaction("xeletiene", transaction_id);
+      //await createTransaction("xeletiene", transaction_id);
       return newTransaction;
     } catch (error) {
       console.error("Error in cashOnDelivery:", error);
