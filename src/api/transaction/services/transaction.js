@@ -237,7 +237,7 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
         },
       });
 
-      //await createTransaction("xeletiene", transaction_id);
+      await createTransaction("xeletiene", transaction_id);
       return newTransaction;
     } catch (error) {
       console.error("Error in cashOnDelivery:", error);
