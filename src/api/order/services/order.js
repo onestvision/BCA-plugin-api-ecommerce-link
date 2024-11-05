@@ -109,17 +109,25 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
           description: orderDescription,
           order_id: `${orderId}${order.id}`,
         },
-        populate: 'product_orders',
+        populate: ['product_orders','shipping'],
       });
 
       const statusMessage = newOrder ? "recibido" : "actualizado"
       const discountMessage = discount > 0 ? `Descuento: $${valueToString(discount)}\n` : ""
       const shippingValueMessage = shipping_value > 0 ? `$${valueToString(shipping_value)}` : "GRATIS"
 
-      const message = `
-      🎉 *¡Todo listo ${user.name}! 🎉 He ${statusMessage} tu orden con éxito.* \nTu número de orden es *${orderId}${order.id}*.\n\n🛒 Estos son los detalles de los productos que seleccionaste:\n${productDescriptions.join('')}\nSubtotal: $${valueToString(subtotal)}\nEnvio: ${shippingValueMessage}\n${discountMessage}*Total: $${valueToString(total)}*\n\n🙌 ${user.name} si tienes dudas o necesitas mas recomendaciones, estoy aquí para lo que necesites.😊`
+      let address = updatedOrder.shipping.address_line_1
 
-      await sendWhatsAppInteractive("Xeletiene", message, user.phone_number, ["🛒Finalizar compra", "🛍️Continuar compra"])
+      if (updatedOrder.shipping.address_line_2) {
+        address += ` ${updatedOrder.shipping.address_line_2}`
+      }
+
+      address += `, ${updatedOrder.shipping.city}, ${updatedOrder.shipping.department}`
+
+      const message = `
+      🎉 *¡Todo listo ${user.name}! 🎉 He ${statusMessage} tu orden con éxito.* \nTu número de orden es *${orderId}${order.id}*.\n\n📍Dirección de Entrega: ${address}\n\n🛒 Estos son los detalles de los productos que seleccionaste:\n${productDescriptions.join('')}\nSubtotal: $${valueToString(subtotal)}\nEnvio: ${shippingValueMessage}\n${discountMessage}*Total: $${valueToString(total)}*\n\n🙌 ${user.name} si tienes dudas o necesitas mas recomendaciones, estoy aquí para lo que necesites.😊`
+
+      await sendWhatsAppInteractive("Xeletiene", message, user.phone_number, ["🛒Finalizar compra", "🛍️Continuar comprando"])
 
       return updatedOrder;
     } catch (error) {

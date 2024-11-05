@@ -77,7 +77,7 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
             transaction_id: transaction_id,
             order: order[0].id,
             transaction_date: finalized_at,
-            payment_id: id,
+            payment_id: `${id}-${Math.floor(10 + Math.random() * 90)}`,
             payment_method: payment_method_type,
             status: transaction_status,
             taxes,
@@ -127,13 +127,21 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
 
         const shippingValueMessage = order[0].shipping_value > 0 ? `$${valueToString(order[0].shipping_value)}` : "GRATIS"
 
+        let address = order[0].shipping.address_line_1
+
+        if (order[0].shipping.address_line_2) {
+          address += ` ${order[0].shipping.address_line_2}`
+        }
+
+        address += `, ${order[0].shipping.city}, ${order[0].shipping.department}`
+
         const descriptionMessage = order[0].description
           .split('\n')
           .filter(line => line.trim() !== '')
           .map(line => `📌${line}`)
           .join('\n');
 
-        const message = `🎊 *¡${user.name}, Gracias por tu compra!* 🎊\nMe alegra informarte que tu pago ha sido procesado con éxito. El número de comprobante de tu transacción es *${transaction_id}*.\n\n📦Aquí tienes los detalles de tu pedido:\n${descriptionMessage}\n\nSubtotal: $${valueToString(subtotal)}\nEnvio: ${shippingValueMessage}${taxesMessage}\n*Total: $${valueToString(total)}*\n\n🚚Tu pedido fue enviado a travez de *COORDINADORA*.📦\nYo te mantendré al tanto de las novedades de tu envio 📲 pero siempre puedes rastrearlo con el número de guia: *${tracking_code}* 🔎\n\n😊Si tienes alguna pregunta o necesitas asistencia, no dudes en contactarme. ¡Estoy aquí para ayudarte!\n\n🌟 *¡${user.name} espero que disfrutes tu compra!* 🌟`
+        const message = `🎊 *¡${user.name}, Gracias por tu compra!* 🎊\nMe alegra informarte que tu pago ha sido procesado con éxito. El número de comprobante de tu transacción es *${transaction_id}*.\n\n📦Aquí tienes los detalles de tu pedido:\n${descriptionMessage}\n\nSubtotal: $${valueToString(subtotal)}\nEnvio: ${shippingValueMessage}${taxesMessage}\n*Total: $${valueToString(total)}*\n\n📍Dirección de Entrega:${address}\n\n🚚Tu pedido fue enviado a travez de *COORDINADORA*.📦\nYo te mantendré al tanto de las novedades de tu envio 📲 pero siempre puedes rastrearlo con el número de guia: *${tracking_code}* 🔎\n\n😊Si tienes alguna pregunta o necesitas asistencia, no dudes en contactarme. ¡Estoy aquí para ayudarte!\n\n🌟 *¡${user.name} espero que disfrutes tu compra!* 🌟`
 
         await sendWhatsAppMessage("Xeletiene", message, user.phone_number)
         await generateLabel("901277226", tracking_code)
@@ -174,7 +182,7 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
         },
         populate: ['shipping', 'shipping_details', "user"],
       });
-      
+
       if (order.length === 0) {
         return 'Order not found with status "processing".';
       }
@@ -238,6 +246,9 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
       });
 
       await createTransaction("xeletiene", transaction_id);
+      await generateLabel("901277226", tracking_code)
+      //await generateDistpatch("901277226",tracking_code)
+
       return newTransaction;
     } catch (error) {
       console.error("Error in cashOnDelivery:", error);
