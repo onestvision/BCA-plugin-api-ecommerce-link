@@ -22,7 +22,7 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
       const shipping_details_added = addShippingDetails(shipping_details)
 
       if (order.length == 0) {
-        orderId = `OR${Math.floor(100000 + Math.random() * 900000)}`;
+        orderId = `OC${Math.floor(100000 + Math.random() * 900000)}`;
         newOrder = true
         order = await strapi.entityService.create('api::order.order', {
           data: {

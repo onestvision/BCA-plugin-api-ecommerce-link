@@ -787,11 +787,6 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::shipping.shipping'
     >;
-    user_activities: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'oneToMany',
-      'api::user-activity.user-activity'
-    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1407,12 +1402,12 @@ export interface ApiUserActivityUserActivity extends Schema.CollectionType {
     draftAndPublish: false;
   };
   attributes: {
-    users_permissions_user: Attribute.Relation<
-      'api::user-activity.user-activity',
-      'manyToOne',
-      'plugin::users-permissions.user'
-    >;
-    description: Attribute.String;
+    user_phone: Attribute.String;
+    session_id: Attribute.String;
+    activity_type: Attribute.String;
+    activity_data: Attribute.JSON;
+    app: Attribute.String;
+    activity_date: Attribute.DateTime;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<

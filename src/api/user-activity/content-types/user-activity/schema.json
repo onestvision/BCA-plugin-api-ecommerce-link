@@ -12,14 +12,23 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "users_permissions_user": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "plugin::users-permissions.user",
-      "inversedBy": "user_activities"
-    },
-    "description": {
+    "user_phone": {
       "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "activity_type": {
+      "type": "string"
+    },
+    "activity_data": {
+      "type": "json"
+    },
+    "app": {
+      "type": "string"
+    },
+    "activity_date": {
+      "type": "datetime"
     }
   }
 }
