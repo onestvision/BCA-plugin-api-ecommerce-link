@@ -787,6 +787,11 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::shipping.shipping'
     >;
+    user_activities: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::user-activity.user-activity'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1390,6 +1395,41 @@ export interface ApiTransactionTransaction extends Schema.CollectionType {
   };
 }
 
+export interface ApiUserActivityUserActivity extends Schema.CollectionType {
+  collectionName: 'user_activities';
+  info: {
+    singularName: 'user-activity';
+    pluralName: 'user-activities';
+    displayName: 'User_activity';
+    description: '';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    users_permissions_user: Attribute.Relation<
+      'api::user-activity.user-activity',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    description: Attribute.String;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::user-activity.user-activity',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::user-activity.user-activity',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiVariationVariation extends Schema.CollectionType {
   collectionName: 'variations';
   info: {
@@ -1484,6 +1524,7 @@ declare module '@strapi/types' {
       'api::product-order.product-order': ApiProductOrderProductOrder;
       'api::shipping.shipping': ApiShippingShipping;
       'api::transaction.transaction': ApiTransactionTransaction;
+      'api::user-activity.user-activity': ApiUserActivityUserActivity;
       'api::variation.variation': ApiVariationVariation;
     }
   }

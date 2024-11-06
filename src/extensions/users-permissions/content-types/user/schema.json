@@ -90,6 +90,12 @@
       "relation": "oneToMany",
       "target": "api::shipping.shipping",
       "mappedBy": "user"
+    },
+    "user_activities": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::user-activity.user-activity",
+      "mappedBy": "users_permissions_user"
     }
   }
 }
