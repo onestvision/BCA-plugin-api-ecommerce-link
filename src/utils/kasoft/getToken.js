@@ -6,7 +6,7 @@ async function getToken(company) {
   try {
     const response = await axios.post(url, {
       user: process.env.KASOFT_USER,
-      secretKey: "APkknqM5YpK#cg!x!F6WH#",
+      secretKey: process.env.KASOFT_SECRET_KEY,
       app:process.env.KASOFT_APP,
       company: company
     })    
