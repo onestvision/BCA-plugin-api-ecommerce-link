@@ -1084,9 +1084,10 @@ export interface ApiLogLog extends Schema.CollectionType {
     singularName: 'log';
     pluralName: 'logs';
     displayName: 'Logs';
+    description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     RequestType: Attribute.String;
@@ -1101,7 +1102,6 @@ export interface ApiLogLog extends Schema.CollectionType {
     client_id: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<'api::log.log', 'oneToOne', 'admin::user'> &
       Attribute.Private;
     updatedBy: Attribute.Relation<'api::log.log', 'oneToOne', 'admin::user'> &
