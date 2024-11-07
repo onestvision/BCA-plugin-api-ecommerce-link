@@ -1,0 +1,45 @@
+{
+  "kind": "collectionType",
+  "collectionName": "logs",
+  "info": {
+    "singularName": "log",
+    "pluralName": "logs",
+    "displayName": "Logs"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "RequestType": {
+      "type": "string"
+    },
+    "RequestUrl": {
+      "type": "string"
+    },
+    "ResponseStatus": {
+      "type": "string"
+    },
+    "CreateDate": {
+      "type": "datetime"
+    },
+    "ReceiveDate": {
+      "type": "datetime"
+    },
+    "RequestHeader": {
+      "type": "json"
+    },
+    "RequestBody": {
+      "type": "json"
+    },
+    "ResponseBody": {
+      "type": "json"
+    },
+    "phone_number": {
+      "type": "string"
+    },
+    "client_id": {
+      "type": "string"
+    }
+  }
+}
