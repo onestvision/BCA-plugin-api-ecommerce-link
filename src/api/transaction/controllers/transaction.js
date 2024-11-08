@@ -19,8 +19,13 @@ module.exports = createCoreController('api::transaction.transaction', ({ strapi 
     }
   },
   async cashOnDelivery(ctx) {
+    const headers = {
+      sessionId: ctx.request.headers['x-session-id'],
+      userPhone: ctx.request.headers['x-user-phone'],
+      clientId: ctx.request.headers['x-client-id']
+    };
     try {
-      return await strapi.service('api::transaction.transaction').cashOnDelivery(ctx.request.body);
+      return await strapi.service('api::transaction.transaction').cashOnDelivery(ctx.request.body, headers);
     } catch (error) {
       console.log(error);
     }
