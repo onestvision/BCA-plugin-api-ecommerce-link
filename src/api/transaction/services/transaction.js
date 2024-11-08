@@ -178,13 +178,13 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
           user: {
             phone_number: { $eq: phone_number }
           },
-          status: { $eq: "processing" }
+          status: { $eq: "payment_pending" }
         },
         populate: ['shipping', 'shipping_details', "user"],
       });
 
       if (order.length === 0) {
-        return 'Order not found with status "processing".';
+        return 'Order not found with status "payment_pending".';
       }
 
       const tracking_code = await getTrackingCode(order[0], true, payment_method);
