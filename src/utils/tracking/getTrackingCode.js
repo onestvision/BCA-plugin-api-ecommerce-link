@@ -1,6 +1,6 @@
 const axios = require("axios");
 
-async function getTrackingCode(order, cashOnDelivery = false, payment_method = "efectivo") {
+async function getTrackingCode(order, headers=null, cashOnDelivery = false, payment_method = "efectivo") {
   const url = `${process.env.TRACKING_URL}/coordinadora/generate-guide`
   const { shipping } = order
 
@@ -13,7 +13,7 @@ async function getTrackingCode(order, cashOnDelivery = false, payment_method = "
         "div": "1",
         "full_name": shipping.full_name,
         "address": (shipping.address_line_2 && shipping.address_line_2 != "") ? `${shipping.address_line_1} ${shipping.address_line_2}` : shipping.address_line_1,
-        "city": await getCoordinadoraCode(shipping.city, shipping.department),
+        "city": await getCoordinadoraCode(shipping.city, shipping.department, headers),
         "phone": shipping.phone_number,
         "email": shipping.email
       },
@@ -28,7 +28,9 @@ async function getTrackingCode(order, cashOnDelivery = false, payment_method = "
       "cashOnDeliveryPaymentMethod": payment_method
     }    
     
-    const response = await axios.post(url, body) 
+    const response = await axios.post(url, body, {
+      headers:headers
+    }) 
     
     if (response.data["status"] === true) {
       return response.data.data.codigo_remision
@@ -39,12 +41,14 @@ async function getTrackingCode(order, cashOnDelivery = false, payment_method = "
   }
 }
 
-async function getCoordinadoraCode(city, department) {
+async function getCoordinadoraCode(city, department, headers) {
   const url = `${process.env.TRACKING_URL}/city-code/getCoordinadoraCityCode`
   try {
     const response = await axios.post(url, {
       city: city,
       department: department
+    },{
+      headers: headers
     })
 
     if (response.data.error == null) {

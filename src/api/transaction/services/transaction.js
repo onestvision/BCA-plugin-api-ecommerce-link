@@ -168,7 +168,7 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
     }
   },
 
-  async cashOnDelivery(data) {
+  async cashOnDelivery(data, headers) {
     try {
       const { phone_number, identify_number, identification_type, full_name, razon_social, email, payment_method } = data;
       validateData(data);
@@ -187,7 +187,7 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
         throw new Error('Order not found with status "payment_pending".');
       }
 
-      const tracking_code = await getTrackingCode(order[0], true, payment_method);
+      const tracking_code = await getTrackingCode(order[0], headers, true, payment_method);
 
       await strapi.entityService.update('api::order.order', order[0].id, {
         data: {
