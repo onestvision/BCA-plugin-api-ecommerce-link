@@ -1078,6 +1078,37 @@ export interface ApiGlobalConfigGlobalConfig extends Schema.CollectionType {
   };
 }
 
+export interface ApiLogLog extends Schema.CollectionType {
+  collectionName: 'logs';
+  info: {
+    singularName: 'log';
+    pluralName: 'logs';
+    displayName: 'Logs';
+    description: '';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    RequestType: Attribute.String;
+    RequestUrl: Attribute.String;
+    ResponseStatus: Attribute.String;
+    CreateDate: Attribute.DateTime;
+    ReceiveDate: Attribute.DateTime;
+    RequestHeader: Attribute.JSON;
+    RequestBody: Attribute.JSON;
+    ResponseBody: Attribute.JSON;
+    phone_number: Attribute.String;
+    client_id: Attribute.String;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::log.log', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::log.log', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
 export interface ApiOrderOrder extends Schema.CollectionType {
   collectionName: 'orders';
   info: {
@@ -1513,6 +1544,7 @@ declare module '@strapi/types' {
       'api::category.category': ApiCategoryCategory;
       'api::colection.colection': ApiColectionColection;
       'api::global-config.global-config': ApiGlobalConfigGlobalConfig;
+      'api::log.log': ApiLogLog;
       'api::order.order': ApiOrderOrder;
       'api::payment.payment': ApiPaymentPayment;
       'api::product.product': ApiProductProduct;
