@@ -184,7 +184,7 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
       });
 
       if (order.length === 0) {
-        return 'Order not found with status "payment_pending".';
+        throw new Error('Order not found with status "payment_pending".');
       }
 
       const tracking_code = await getTrackingCode(order[0], true, payment_method);
