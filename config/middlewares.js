@@ -1,8 +1,20 @@
-module.exports = [
+module.exports = ({ env }) => [
   'strapi::logger',
   'strapi::errors',
   'strapi::security',
-  'strapi::cors',
+  {
+    name: 'strapi::cors',
+    config: {
+      origin: '*', // Permitir solicitudes desde cualquier dominio
+      headers: [
+        'Content-Type',
+        'Authorization',
+        'x-user-phone', // Añade aquí tus headers personalizados
+        'x-client-id',
+        'x-session-id',
+      ],
+    },
+  },
   'strapi::poweredBy',
   'strapi::query',
   'strapi::body',
