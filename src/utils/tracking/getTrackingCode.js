@@ -33,6 +33,15 @@ async function getTrackingCode(order, headers=null, cashOnDelivery = false, paym
     }) 
     
     if (response.data["status"] === true) {
+      strapi.entityService.create('api::user-activity.user-activity',{
+        data: {
+          user_phone: shipping.phone_number,
+          session_id: "",
+          activity_type: "generate_guide",
+          app:"",
+          activity_date: Date.now()
+        },
+      })
       return response.data.data.codigo_remision
     } 
     return `Error generating waybill: ${response.data.error}`

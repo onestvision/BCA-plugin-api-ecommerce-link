@@ -83,8 +83,6 @@ async function createTransaction(company, transaction_id) {
       Total: transactionSelected.total,
     }
 
-    console.log(body);
-
     const token = await getToken("xeletiene")
     const response = await axios.post(url, body, {
       headers: {
@@ -95,6 +93,7 @@ async function createTransaction(company, transaction_id) {
     if (!response.data.success) {
       throw Error(`Error generating a Kasoft transaction: ${response.data.error}`)
     }
+    return response.data
   } catch (error) {
     console.log(error)
   }
