@@ -1,10 +1,10 @@
 const axios = require('axios');
 const { getToken } = require('./getToken');
 
-async function updateTransaction(company, transaction_id, status) {
-  const url = `${process.env.KASOFT_URL}/${company}/transactions/status`
+async function updateOrder(company, order_id, status, guide, transporter) {
+  const url = `${process.env.KASOFT_URL}/${company}/orders/transporter-info`
 
-  if (transaction_id == null || transaction_id.trim() == "") {
+  if (order_id == null || order_id.trim() == "") {
     throw new Error("transaccion id must not be null");
   }
   if (status == null || status.trim() == "") {
@@ -13,18 +13,19 @@ async function updateTransaction(company, transaction_id, status) {
 
   try {
     const token = await getToken("xeletiene")
-    const response = await axios.put(url, {
-      TransactionId: transaction_id,
-      Status: status
+    await axios.put(url, {
+      OrderId: order_id,
+      Status: status,
+      Guide: guide,
+      Transporter: transporter
     }, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
-    return response.data
   } catch (error) {
     console.log(error)
   }
 }
 
-module.exports = { updateTransaction };
+module.exports = { updateOrder };
