@@ -33,7 +33,7 @@ module.exports = {
           })
         }
         if (model.uid == "api::transaction.transaction") {
-          const transaction_id = `TR${result.id}`
+          const transaction_id = `TRC${result.id}`
           await strapi.entityService.update(model.uid, result.id, {
             data: { transaction_id: transaction_id },
           })
