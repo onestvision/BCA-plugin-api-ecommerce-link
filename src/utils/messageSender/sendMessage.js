@@ -18,7 +18,7 @@ async function sendWhatsAppMessage(bussiness, message, phoneNumber) {
       phoneNumbers: [phoneNumber.trim()]
     })
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 

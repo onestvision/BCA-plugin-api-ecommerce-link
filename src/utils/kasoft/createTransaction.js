@@ -4,29 +4,26 @@ const { getToken } = require('./getToken');
 
 async function createTransaction(company, transaction_id) {
   const url = `${process.env.KASOFT_URL}/${company}/transactions`
-  if (transaction_id == null || transaction_id.trim() == "") {
+  if (transaction_id == null || transaction_id == 0) {
     throw new Error("transaccion id must not be null");
   }
 
   try {
-    const transaction = await strapi.entityService.findMany('api::transaction.transaction', {
-      filters: { transaction_id: { $eq: transaction_id } },
+    const transaction = await strapi.entityService.findOne('api::transaction.transaction', transaction_id,{
       populate: '*',
     });
-
-    if (transaction.length == 0) {
+    if (transaction == null) {
       throw new Error('Orden no encontrada.');
     }
-    const order = await strapi.entityService.findOne('api::order.order', transaction[0].order.id, {
+    const order = await strapi.entityService.findOne('api::order.order', transaction.order.id, {
       populate: ['product_orders.products', 'shipping'],
     });
     if (order.length == 0) {
       throw new Error('Orden not founds.');
     }
 
-    const transactionSelected = transaction[0]
     const { product_orders, shipping } = order
-    const { firstName, lastName } = splitFullName(transactionSelected.payment.full_name)
+    const { firstName, lastName } = splitFullName(transaction.payment.full_name)
 
     const products = product_orders[0].products.map(product => {
       const unit_price = product.unit_price
@@ -48,19 +45,19 @@ async function createTransaction(company, transaction_id) {
     const department = shipping.city.toLowerCase() === "bogota" && shipping.department.toLowerCase() === "cundinamarca" ? "Bogota D.C" : shipping.department
 
     const body = {
-      Id_transaction: transactionSelected.transaction_id,
+      Id_transaction: transaction.transaction_id,
       Cliente: {
-        Id: transactionSelected.payment.identify_number,
-        Razon_social: transactionSelected.payment.razon_social,
+        Id: transaction.payment.identify_number,
+        Razon_social: transaction.payment.razon_social,
         Nombres: firstName,
         Apellidos: lastName,
-        Celular: transactionSelected.payment.phone_number,
-        Email: transactionSelected.payment.email,
+        Celular: transaction.payment.phone_number,
+        Email: transaction.payment.email,
         Direccion: shipping.address_line_2 ? `${shipping.address_line_1} - ${shipping.address_line_2}` : shipping.address_line_1,
         Codigo_ciudad: shipping.city,
         Codigo_departamento: department,
         Pais: shipping.country,
-        Tipo_identificacion: transactionSelected.payment.identification_type,
+        Tipo_identificacion: transaction.payment.identification_type,
       },
       Order: {
         Id: order.order_id,
@@ -73,14 +70,14 @@ async function createTransaction(company, transaction_id) {
         Total: order.total,
       },
       Products: products,
-      Fecha_transaccion: transactionSelected.transaction_date,
-      Indicador_pago: transactionSelected.payment_id,
-      Metodo_pago: transactionSelected.payment_method,
-      Estado_transaccion: transactionSelected.status,
-      Impuestos: transactionSelected.taxes,
-      Total_neto: transactionSelected.subtotal,
+      Fecha_transaccion: transaction.transaction_date,
+      Indicador_pago: transaction.payment_id,
+      Metodo_pago: transaction.payment_method,
+      Estado_transaccion: transaction.status,
+      Impuestos: transaction.taxes,
+      Total_neto: transaction.subtotal,
       Currency: "COP",
-      Total: transactionSelected.total,
+      Total: transaction.total,
     }
 
     const token = await getToken("xeletiene")
@@ -95,7 +92,7 @@ async function createTransaction(company, transaction_id) {
     }
     return response.data
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 

@@ -1061,6 +1061,7 @@ export interface ApiGlobalConfigGlobalConfig extends Schema.CollectionType {
       'api::variation.variation'
     >;
     integration_type: Attribute.Enumeration<['manual', 'woocomerce']>;
+    phone_number: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1185,7 +1186,7 @@ export interface ApiPaymentPayment extends Schema.CollectionType {
     full_name: Attribute.String;
     identify_number: Attribute.String & Attribute.Required & Attribute.Unique;
     identification_type: Attribute.String;
-    phone_number: Attribute.String & Attribute.Required & Attribute.Unique;
+    phone_number: Attribute.String & Attribute.Required;
     email: Attribute.Email;
     razon_social: Attribute.String;
     user: Attribute.Relation<
@@ -1393,7 +1394,7 @@ export interface ApiTransactionTransaction extends Schema.CollectionType {
     taxes: Attribute.Decimal;
     subtotal: Attribute.Decimal;
     total: Attribute.Decimal;
-    transaction_id: Attribute.String & Attribute.Required & Attribute.Unique;
+    transaction_id: Attribute.String & Attribute.Unique;
     order: Attribute.Relation<
       'api::transaction.transaction',
       'manyToOne',

@@ -92,6 +92,9 @@
         "manual",
         "woocomerce"
       ]
+    },
+    "phone_number": {
+      "type": "string"
     }
   }
 }

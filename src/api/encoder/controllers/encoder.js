@@ -23,7 +23,7 @@ module.exports = {
         data: encoderData
       });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       ctx.badRequest('Error getting external data', { error: err });
     }
   }
