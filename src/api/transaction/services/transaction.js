@@ -13,7 +13,7 @@ const { generateLabel } = require('../../../utils/tracking/generateLabel');
 const { getTrackingCode } = require('../../../utils/tracking/getTrackingCode');
 
 const xeletiene_business = "Xeletiene"
-const xeletiene_business_NIT = "901277226"
+const xeletiene_business_NIT = "901864903"
 const xeletiene_contact_number = "573002319650"
 
 module.exports = createCoreService('api::transaction.transaction', ({ strapi }) => ({
