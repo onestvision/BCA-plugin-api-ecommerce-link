@@ -12,7 +12,7 @@ async function getToken(company) {
     })    
     return response.data.data.token
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 

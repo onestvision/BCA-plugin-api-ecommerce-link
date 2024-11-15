@@ -18,7 +18,7 @@ async function sendWhatsAppSimpleTemplate(bussiness, template, user) {
       users: [user]
     })
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 

@@ -12,6 +12,10 @@ const { generateDistpatch } = require('../../../utils/tracking/generateDispatch'
 const { generateLabel } = require('../../../utils/tracking/generateLabel');
 const { getTrackingCode } = require('../../../utils/tracking/getTrackingCode');
 
+const xeletiene_business = "Xeletiene"
+const xeletiene_business_NIT = "901277226"
+const xeletiene_contact_number = "573002319650"
+
 module.exports = createCoreService('api::transaction.transaction', ({ strapi }) => ({
   async processPayment(data) {
     try {
@@ -24,8 +28,8 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
       });
 
       if (order.length == 0) {
-        sendWhatsAppSimpleTemplate(process.env.XELETIENE_BUSSINESS, "no_order_error_v2", {
-          phone: process.env.XELETIENE_ERROR_NUMBER,
+        sendWhatsAppSimpleTemplate(xeletiene_business, "no_order_error_v2", {
+          phone: xeletiene_contact_number,
           parameters: [id, finalized_at, customer_data.full_name]
         })
         throw new Error('Order not found.');
@@ -77,10 +81,8 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
 
       if (trans.length == 0) {
         newTrans = true
-        transaction_id = `TR${Math.floor(100000 + Math.random() * 900000)}${order[0].id}`
         newTransaction = await strapi.entityService.create('api::transaction.transaction', {
           data: {
-            transaction_id: transaction_id,
             order: order[0].id,
             transaction_date: finalized_at,
             payment_id: `${id}-${Math.floor(10 + Math.random() * 90)}`,
@@ -155,9 +157,9 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
           await updateOrder("xeletiene", order[0].order_id, "completed", tracking_code, "COORDINADORA")
 
           const message = `🎊 *¡${user.name}, Gracias por tu compra!* 🎊\nMe alegra informarte que tu pago ha sido procesado con éxito. El número de comprobante de tu transacción es *${transaction_id}*.\n\n📦Aquí tienes los detalles de tu pedido:\n${descriptionMessage}\n\nSubtotal: $${valueToString(subtotal)}\nEnvio: ${shippingValueMessage}${taxesMessage}\n*Total: $${valueToString(total)}*\n\n📍Dirección de Entrega:${address}\n\n🚚Tu pedido fue enviado a travez de *COORDINADORA*.📦\nYo te mantendré al tanto de las novedades de tu envio 📲 pero siempre puedes rastrearlo con el número de guia: *${tracking_code}* 🔎\n\n😊Si tienes alguna pregunta o necesitas asistencia, no dudes en contactarme. ¡Estoy aquí para ayudarte!\n\n🌟 *¡${user.name} espero que disfrutes tu compra!* 🌟`
-          await sendWhatsAppMessage(process.env.XELETIENE_BUSSINESS, message, user.phone_number)
+          await sendWhatsAppMessage(xeletiene_business, message, user.phone_number)
 
-          await generateLabel(process.env.XELETIENE_BUSSINESS_NIT, tracking_code)
+          await generateLabel(xeletiene_business_NIT, tracking_code)
 
         }
 
@@ -174,12 +176,12 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
         newTrans ? await createTransaction("xeletiene", transaction_id) : await updateTransaction("xeletiene", transaction_id, transaction_status);
 
         const message = `😕 Parece que hubo un problema al procesar tu pago. Puedes intentarlo de nuevo presionando *"Reintentar compra"*.📲 Si el problema continúa, aquí estamos para ayudarte.\n🙏 ¡Gracias por tu comprensión y paciencia!`
-        await sendWhatsAppInteractive(process.env.XELETIENE_BUSSINESS, message, user.phone_number, ["🔄Reintentar compra"])
+        await sendWhatsAppInteractive(xeletiene_business, message, user.phone_number, ["🔄Reintentar compra"])
       }
 
       return newTransaction
     } catch (error) {
-      console.log('We have problems creating a new transaction');
+      console.error('We have problems creating a new transaction');
       throw error;
     }
   },
@@ -202,13 +204,6 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
       if (order.length === 0) {
         throw new Error('Order not found with status "payment_pending".');
       }
-      await strapi.entityService.update('api::order.order', order[0].id, {
-        data: {
-          status: "pending",
-          logistics_provider: "Generating tracking code..",
-          tracking_code: "Generating tracking code.."
-        },
-      });
 
       if (order[0].user.email.includes("@correo.com")) {
         await strapi.entityService.update('plugin::users-permissions.user', order[0].user.id, {
@@ -239,15 +234,13 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
         payment = payment[0];
       }
 
-      const transaction_id = `TR${Math.floor(100000 + Math.random() * 900000)}${order[0].id}`;
       const taxes = 0;
       const total = taxes + order[0].total;
       const newTransaction = await strapi.entityService.create('api::transaction.transaction', {
         data: {
-          transaction_id: transaction_id,
           order: order[0].id,
           transaction_date: setLocalDateTime(),
-          payment_id: transaction_id.replace("TR", ""),
+          payment_id: `${Math.floor(100000 + Math.random() * 900000)}${order[0].id}`,
           payment_method: "PAGO CONTRAENTREGA",
           status: "completed",
           taxes: taxes,
@@ -257,8 +250,15 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
           payment: payment.id
         },
       });
+      await strapi.entityService.update('api::order.order', order[0].id, {
+        data: {
+          status: "pending",
+          logistics_provider: "Generating tracking code..",
+          tracking_code: "Generating tracking code.."
+        },
+      });
 
-      const saveTransaction = await createTransaction("xeletiene", transaction_id);
+      const saveTransaction = await createTransaction("xeletiene", newTransaction.id);
       if (saveTransaction["success"]) {
         const tracking_code = await getTrackingCode(order[0], headers, true, payment_method);
         await strapi.entityService.update('api::order.order', order[0].id, {
@@ -270,7 +270,7 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
         });
         await updateOrder("xeletiene", order[0].order_id, "completed", tracking_code, "COORDINADORA")
 
-        await generateLabel(process.env.XELETIENE_BUSSINESS_NIT, tracking_code)
+        await generateLabel(xeletiene_business_NIT, tracking_code)
 
       }
 

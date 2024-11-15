@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 module.exports = {
   /**
@@ -19,12 +19,26 @@ module.exports = {
   async bootstrap({ strapi }) {
     strapi.db.lifecycles.subscribe({
       async afterCreate(event) {
-        const { model, result } = event;
+        const { model, result } = event
         
         await strapi.entityService.update(model.uid, result.id, {
           data: { publishedAt: new Date() },
-        });
+        })
+        
+        if (model.uid == "api::order.order") {
+          const order_id = `OC${result.id}`
+          
+          await strapi.entityService.update(model.uid, result.id, {
+            data: { order_id: order_id },
+          })
+        }
+        if (model.uid == "api::transaction.transaction") {
+          const transaction_id = `TR${result.id}`
+          await strapi.entityService.update(model.uid, result.id, {
+            data: { transaction_id: transaction_id },
+          })
+        }
       }
     })
   },
-};
+}

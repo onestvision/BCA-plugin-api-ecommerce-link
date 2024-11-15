@@ -1,9 +1,14 @@
 const axios = require("axios");
 
-async function getTrackingCode(order, headers=null, cashOnDelivery = false, payment_method = "efectivo") {
+async function getTrackingCode(order, headers = null, cashOnDelivery = false, payment_method = "efectivo") {
+  const token = process.env.TRACKING_API_TOKEN
   const url = `${process.env.TRACKING_URL}/coordinadora/generate-guide`
   const { shipping } = order
 
+  headers = {
+    ...headers,
+    Authorization: `Bearer ${token}`,
+  };
   try {
     const body = {
       "nit": "901277226",
@@ -26,24 +31,22 @@ async function getTrackingCode(order, headers=null, cashOnDelivery = false, paym
       "shipping_details": order.shipping_details,
       "cashOnDelivery": cashOnDelivery,
       "cashOnDeliveryPaymentMethod": payment_method
-    }    
-    
-    const response = await axios.post(url, body, {
-      headers:headers
-    }) 
-    
+    }
+
+    const response = await axios.post(url, body, { headers })
+
     if (response.data["status"] === true) {
-      strapi.entityService.create('api::user-activity.user-activity',{
+      strapi.entityService.create('api::user-activity.user-activity', {
         data: {
           user_phone: shipping.phone_number,
           session_id: "",
           activity_type: "generate_guide",
-          app:"",
+          app: "",
           activity_date: Date.now()
         },
       })
       return response.data.data.codigo_remision
-    } 
+    }
     return `Error generating waybill: ${response.data.error}`
   } catch (error) {
     throw new Error(`Error generating waybill: ${error.message}`);
@@ -56,9 +59,7 @@ async function getCoordinadoraCode(city, department, headers) {
     const response = await axios.post(url, {
       city: city,
       department: department
-    },{
-      headers: headers
-    })
+    }, { headers })
 
     if (response.data.error == null) {
       return response.data.data.dane_code

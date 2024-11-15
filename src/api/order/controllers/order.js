@@ -50,7 +50,7 @@ module.exports = createCoreController('api::order.order', ({ strapi }) => ({
       }
       return ctx.badRequest()
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 }));;

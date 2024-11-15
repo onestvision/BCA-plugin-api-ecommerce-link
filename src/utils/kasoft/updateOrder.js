@@ -24,7 +24,7 @@ async function updateOrder(company, order_id, status, guide, transporter) {
       }
     })
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 

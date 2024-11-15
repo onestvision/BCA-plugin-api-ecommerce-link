@@ -23,7 +23,7 @@ async function updateTransaction(company, transaction_id, status) {
     })
     return response.data
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 

@@ -23,7 +23,7 @@ async function sendWhatsAppInteractive(bussiness, message, phoneNumber, buttons)
       buttons: buttons
     })
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 

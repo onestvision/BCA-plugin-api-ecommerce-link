@@ -22,7 +22,6 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
       const shipping_details_added = addShippingDetails(shipping_details)
 
       if (order.length == 0) {
-        orderId = `OC${Math.floor(100000 + Math.random() * 900000)}`;
         newOrder = true
         order = await strapi.entityService.create('api::order.order', {
           data: {
@@ -39,12 +38,13 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
       } else {
         newOrder = false
         order = order[0]
-        orderId = order.order_id.substring(0, 8);
+        orderId = order.order_id
         if (order.status == "processing") {
           await strapi.entityService.update('api::order.order', order.id, {
             data: {
               user: user.id,
               coupon: coupon,
+              order_id: orderId,
               discount: discount,
               subtotal: subtotal,
               total: total,
@@ -107,7 +107,6 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
       const updatedOrder = await strapi.entityService.update('api::order.order', order.id, {
         data: {
           description: orderDescription,
-          order_id: `${orderId}${order.id}`,
         },
         populate: ['product_orders','shipping'],
       });
