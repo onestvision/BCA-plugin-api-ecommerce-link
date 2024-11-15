@@ -124,7 +124,7 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
       address += `, ${updatedOrder.shipping.city}, ${updatedOrder.shipping.department}`
 
       const message = `
-      🎉 *¡Todo listo ${user.name}! 🎉 He ${statusMessage} tu orden con éxito.* \nTu número de orden es *${orderId}${order.id}*.\n\n📍Dirección de Entrega: ${address}\n\n🛒 Estos son los detalles de los productos que seleccionaste:\n${productDescriptions.join('')}\nSubtotal: $${valueToString(subtotal)}\nEnvio: ${shippingValueMessage}\n${discountMessage}*Total: $${valueToString(total)}*\n\n🙌 ${user.name} si tienes dudas o necesitas mas recomendaciones, estoy aquí para lo que necesites.😊`
+      🎉 *¡Todo listo ${user.name}! 🎉 He ${statusMessage} tu orden con éxito.* \nTu número de orden es *OC${order.id}*.\n\n📍Dirección de Entrega: ${address}\n\n🛒 Estos son los detalles de los productos que seleccionaste:\n${productDescriptions.join('')}\nSubtotal: $${valueToString(subtotal)}\nEnvio: ${shippingValueMessage}\n${discountMessage}*Total: $${valueToString(total)}*\n\n🙌 ${user.name} si tienes dudas o necesitas mas recomendaciones, estoy aquí para lo que necesites.😊`
 
       await sendWhatsAppInteractive("Xeletiene", message, user.phone_number, ["🛒Ir a Pagar", "🛍️Modificar Orden"])
 
