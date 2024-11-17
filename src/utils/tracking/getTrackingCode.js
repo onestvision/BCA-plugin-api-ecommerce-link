@@ -41,8 +41,9 @@ async function getTrackingCode(order, headers = null, cashOnDelivery = false, pa
           user_phone: shipping.phone_number,
           session_id: "",
           activity_type: "generate_guide",
-          app: "",
-          activity_date: Date.now()
+          app: "chatbot",
+          activity_date: Date.now(),
+          activity_data: response.data.data
         },
       })
       return response.data.data.codigo_remision
