@@ -9,15 +9,21 @@ async function createTransaction(company, transaction_id) {
   }
 
   try {
-    const transaction = await strapi.entityService.findOne('api::transaction.transaction', transaction_id,{
+    const transaction = await strapi.entityService.findOne('api::transaction.transaction', transaction_id, {
       populate: '*',
     });
+
+    console.log(transaction);
+    
     if (transaction == null) {
       throw new Error('Orden no encontrada.');
     }
     const order = await strapi.entityService.findOne('api::order.order', transaction.order.id, {
       populate: ['product_orders.products', 'shipping'],
     });
+
+    console.log(order);
+    
     if (order.length == 0) {
       throw new Error('Orden not founds.');
     }
@@ -77,8 +83,10 @@ async function createTransaction(company, transaction_id) {
       impuestos: transaction.taxes,
       total_neto: transaction.subtotal,
       currency: "COP",
-      total: transaction.total,
+      total: transaction.total
     }
+
+    console.log(body);
 
     const token = await getToken("xeletiene")
     const response = await axios.post(url, body, {
@@ -87,9 +95,14 @@ async function createTransaction(company, transaction_id) {
       }
     })
     
+    console.log(response);
+    
     if (!response.data.success) {
       throw Error(`Error generating a Kasoft transaction: ${response.data.error}`)
     }
+
+    console.log(response.data);
+    
     return response.data
   } catch (error) {
     console.error(error)
