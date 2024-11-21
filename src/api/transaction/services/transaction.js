@@ -95,6 +95,7 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
             payment: payment.id
           },
         });
+        transaction_id = newTransaction.id
       } else {
         newTrans = false
         transaction_id = trans[0].transaction_id
