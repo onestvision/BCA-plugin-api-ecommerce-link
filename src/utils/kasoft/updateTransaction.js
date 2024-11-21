@@ -14,8 +14,8 @@ async function updateTransaction(company, transaction_id, status) {
   try {
     const token = await getToken("xeletiene")
     const response = await axios.put(url, {
-      TransactionId: transaction_id,
-      Status: status
+      transaction_id: transaction_id,
+      status: status
     }, {
       headers: {
         Authorization: `Bearer ${token}`

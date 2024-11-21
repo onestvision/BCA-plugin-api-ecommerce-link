@@ -14,10 +14,10 @@ async function updateOrder(company, order_id, status, guide, transporter) {
   try {
     const token = await getToken("xeletiene")
     await axios.put(url, {
-      OrderId: order_id,
-      Status: status,
-      Guide: guide,
-      Transporter: transporter
+      order_id: order_id,
+      status: status,
+      guide: guide,
+      transporter: transporter
     }, {
       headers: {
         Authorization: `Bearer ${token}`
