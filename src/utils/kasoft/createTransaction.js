@@ -9,15 +9,21 @@ async function createTransaction(company, transaction_id) {
   }
 
   try {
-    const transaction = await strapi.entityService.findOne('api::transaction.transaction', transaction_id,{
+    const transaction = await strapi.entityService.findOne('api::transaction.transaction', transaction_id, {
       populate: '*',
     });
+
+    console.log(transaction);
+    
     if (transaction == null) {
       throw new Error('Orden no encontrada.');
     }
     const order = await strapi.entityService.findOne('api::order.order', transaction.order.id, {
       populate: ['product_orders.products', 'shipping'],
     });
+
+    console.log(order);
+    
     if (order.length == 0) {
       throw new Error('Orden not founds.');
     }
@@ -45,40 +51,42 @@ async function createTransaction(company, transaction_id) {
     const department = shipping.city.toLowerCase() === "bogota" && shipping.department.toLowerCase() === "cundinamarca" ? "Bogota D.C" : shipping.department
 
     const body = {
-      Id_transaction: transaction.transaction_id,
-      Cliente: {
-        Id: transaction.payment.identify_number,
-        Razon_social: transaction.payment.razon_social,
-        Nombres: firstName,
-        Apellidos: lastName,
-        Celular: transaction.payment.phone_number,
-        Email: transaction.payment.email,
-        Direccion: shipping.address_line_2 ? `${shipping.address_line_1} - ${shipping.address_line_2}` : shipping.address_line_1,
-        Codigo_ciudad: shipping.city,
-        Codigo_departamento: department,
-        Pais: shipping.country,
-        Tipo_identificacion: transaction.payment.identification_type,
+      id_transaction: transaction.transaction_id,
+      cliente: {
+        id: transaction.payment.identify_number,
+        razon_social: transaction.payment.razon_social,
+        nombres: firstName,
+        apellidos: lastName,
+        celular: transaction.payment.phone_number,
+        email: transaction.payment.email,
+        direccion: shipping.address_line_2 ? `${shipping.address_line_1} - ${shipping.address_line_2}` : shipping.address_line_1,
+        codigo_ciudad: shipping.city,
+        codigo_departamento: department,
+        pais: shipping.country,
+        tipo_identificacion: transaction.payment.identification_type,
       },
-      Order: {
-        Id: order.order_id,
-        Transportadora: order.logistics_provider,
-        Guia: order.tracking_code,
-        Estado_orden: order.status,
-        Cupon: order.coupon,
-        Discount: order.discount,
-        Subtotal: order.subtotal,
-        Total: order.total,
+      order: {
+        id: order.order_id,
+        transportadora: order.logistics_provider,
+        guia: order.tracking_code,
+        estado_orden: order.status,
+        cupon: order.coupon,
+        discount: order.discount,
+        subtotal: order.subtotal,
+        total: order.total,
       },
-      Products: products,
-      Fecha_transaccion: transaction.transaction_date,
-      Indicador_pago: transaction.payment_id,
-      Metodo_pago: transaction.payment_method,
-      Estado_transaccion: transaction.status,
-      Impuestos: transaction.taxes,
-      Total_neto: transaction.subtotal,
-      Currency: "COP",
-      Total: transaction.total,
+      products: products,
+      fecha_transaccion: transaction.transaction_date,
+      indicador_pago: transaction.payment_id,
+      metodo_pago: transaction.payment_method,
+      estado_transaccion: transaction.status,
+      impuestos: transaction.taxes,
+      total_neto: transaction.subtotal,
+      currency: "COP",
+      total: transaction.total
     }
+
+    console.log(body);
 
     const token = await getToken("xeletiene")
     const response = await axios.post(url, body, {
@@ -87,9 +95,14 @@ async function createTransaction(company, transaction_id) {
       }
     })
     
+    console.log(response);
+    
     if (!response.data.success) {
       throw Error(`Error generating a Kasoft transaction: ${response.data.error}`)
     }
+
+    console.log(response.data);
+    
     return response.data
   } catch (error) {
     console.error(error)
