@@ -37,10 +37,10 @@ async function createTransaction(company, transaction_id) {
       const product_id = Number(product.product_id)
       const variation_id = product.variation_id == null ? null : product.variation_id
       return {
-        Id_variacion: variation_id,
-        Id_producto: product_id,
-        Cantidad: amount,
-        Precio_unitario: unit_price,
+        id_variacion: variation_id,
+        id_producto: product_id,
+        cantidad: amount,
+        precio_unitario: unit_price,
       }
     })
 
