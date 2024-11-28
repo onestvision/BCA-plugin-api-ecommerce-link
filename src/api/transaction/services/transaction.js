@@ -12,7 +12,7 @@ const { generateDistpatch } = require('../../../utils/tracking/generateDispatch'
 const { generateLabel } = require('../../../utils/tracking/generateLabel');
 const { getTrackingCode } = require('../../../utils/tracking/getTrackingCode');
 
-const xeletiene_business = "Xeletiene"
+const xeletiene_business = process.env.GATEWAY_BUSSINESS
 const xeletiene_business_NIT = "901864903"
 const xeletiene_contact_number = "573002319650"
 
@@ -27,6 +27,7 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
         populate: ['shipping', 'shipping_details', 'user'],
       });
 
+      
       if (order.length == 0) {
         sendWhatsAppSimpleTemplate(xeletiene_business, "no_order_error_v2", {
           phone: xeletiene_contact_number,
@@ -158,11 +159,11 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
           await updateOrder("xeletiene", order[0].order_id, "completed", tracking_code, "COORDINADORA")
 
           const message = `🎊 *¡${user.name}, Gracias por tu compra!* 🎊\nMe alegra informarte que tu pago ha sido procesado con éxito. El número de comprobante de tu transacción es *TRC${newTransaction.id}*.\n\n📦Aquí tienes los detalles de tu pedido:\n${descriptionMessage}\n\nSubtotal: $${valueToString(subtotal)}\nEnvio: ${shippingValueMessage}${taxesMessage}\n*Total: $${valueToString(total)}*\n\n📍Dirección de Entrega:${address}\n\n🚚Tu pedido fue enviado a travez de *COORDINADORA*.📦\nYo te mantendré al tanto de las novedades de tu envio 📲 pero siempre puedes rastrearlo con el número de guia: *${tracking_code}* 🔎\n\n😊Si tienes alguna pregunta o necesitas asistencia, no dudes en contactarme. ¡Estoy aquí para ayudarte!\n\n🌟 *¡${user.name} espero que disfrutes tu compra!* 🌟`
+
           await sendWhatsAppMessage(xeletiene_business, message, user.phone_number)
 
-          await generateLabel(xeletiene_business_NIT, tracking_code)
-
-        }
+          //await generateLabel(xeletiene_business_NIT, tracking_code)
+        } 
 
         //await generateDistpatch("901277226",tracking_code)
 
