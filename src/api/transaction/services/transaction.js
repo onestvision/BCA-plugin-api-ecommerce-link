@@ -12,7 +12,7 @@ const { generateDistpatch } = require('../../../utils/tracking/generateDispatch'
 const { generateLabel } = require('../../../utils/tracking/generateLabel');
 const { getTrackingCode } = require('../../../utils/tracking/getTrackingCode');
 
-const xeletiene_business = "Xeletiene"
+const xeletiene_business = process.env.GATEWAY_BUSSINESS
 const xeletiene_business_NIT = "901864903"
 const xeletiene_contact_number = "573002319650"
 

@@ -5,6 +5,7 @@ const { sendWhatsAppInteractive } = require('../../../utils/messageSender/sendIn
 const { addShippingDetails } = require('../../../utils/formaters/addShippingDetails');
 const { valueToString } = require('../../../utils/formaters/valueToString');
 
+const bussinessGateway = process.env.GATEWAY_BUSSINESS
 module.exports = createCoreService('api::order.order', ({ strapi }) => ({
   async createOrder(user, products, coupon, discount, subtotal, total, shipping_id, shipping_details, shipping_value) {
     try {
@@ -126,7 +127,7 @@ module.exports = createCoreService('api::order.order', ({ strapi }) => ({
       const message = `
       🎉 *¡Todo listo ${user.name}! 🎉 He ${statusMessage} tu orden con éxito.* \nTu número de orden es *OC${order.id}*.\n\n📍Dirección de Entrega: ${address}\n\n🛒 Estos son los detalles de los productos que seleccionaste:\n${productDescriptions.join('')}\nSubtotal: $${valueToString(subtotal)}\nEnvio: ${shippingValueMessage}\n${discountMessage}*Total: $${valueToString(total)}*\n\n🙌 ${user.name} si tienes dudas o necesitas mas recomendaciones, estoy aquí para lo que necesites.😊`
 
-      await sendWhatsAppInteractive("Xeletiene", message, user.phone_number, ["🛒Ir a Pagar", "🛍️Modificar Orden"])
+      await sendWhatsAppInteractive(bussinessGateway, message, user.phone_number, ["🛒Ir a Pagar", "🛍️Modificar Orden"])
 
       return updatedOrder;
     } catch (error) {
