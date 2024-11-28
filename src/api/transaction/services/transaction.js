@@ -130,8 +130,6 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
 
         const saveTransaction = newTrans ? await createTransaction("xeletiene", transaction_id) : await updateTransaction("xeletiene", transaction_id, transaction_status);
 
-        console.log(saveTransaction);
-
         const shippingValueMessage = order[0].shipping_value > 0 ? `$${valueToString(order[0].shipping_value)}` : "GRATIS"
 
         let address = order[0].shipping.address_line_1
@@ -161,9 +159,10 @@ module.exports = createCoreService('api::transaction.transaction', ({ strapi }) 
           await updateOrder("xeletiene", order[0].order_id, "completed", tracking_code, "COORDINADORA")
 
           const message = `🎊 *¡${user.name}, Gracias por tu compra!* 🎊\nMe alegra informarte que tu pago ha sido procesado con éxito. El número de comprobante de tu transacción es *TRC${newTransaction.id}*.\n\n📦Aquí tienes los detalles de tu pedido:\n${descriptionMessage}\n\nSubtotal: $${valueToString(subtotal)}\nEnvio: ${shippingValueMessage}${taxesMessage}\n*Total: $${valueToString(total)}*\n\n📍Dirección de Entrega:${address}\n\n🚚Tu pedido fue enviado a travez de *COORDINADORA*.📦\nYo te mantendré al tanto de las novedades de tu envio 📲 pero siempre puedes rastrearlo con el número de guia: *${tracking_code}* 🔎\n\n😊Si tienes alguna pregunta o necesitas asistencia, no dudes en contactarme. ¡Estoy aquí para ayudarte!\n\n🌟 *¡${user.name} espero que disfrutes tu compra!* 🌟`
-          //await sendWhatsAppMessage(xeletiene_business, message, user.phone_number)
+          
+          await sendWhatsAppMessage(xeletiene_business, message, user.phone_number)
 
-          await generateLabel(xeletiene_business_NIT, tracking_code)
+          //await generateLabel(xeletiene_business_NIT, tracking_code)
         } 
 
         //await generateDistpatch("901277226",tracking_code)
