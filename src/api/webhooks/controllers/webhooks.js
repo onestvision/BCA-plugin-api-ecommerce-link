@@ -7,7 +7,7 @@ const { closeLiveChat } = require("../../../utils/webhooks/closeLiveChat")
 module.exports = {
   async closeChat(ctx) {
     try {     
-      const phoneNumber = ctx.request.body.visitor.username 
+      const phoneNumber = ctx.request.body.contact_inbox.source_id 
       
       const closeChat = closeLiveChat(phoneNumber);
   
