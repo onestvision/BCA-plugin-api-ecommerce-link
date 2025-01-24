@@ -7,6 +7,12 @@ const { closeLiveChat } = require("../../../utils/webhooks/closeLiveChat")
 module.exports = {
   async closeChat(ctx) {
     try {     
+      if(ctx.request.body.status !== "resolved"){
+        ctx.send({
+          message: 'LiveChat only will be closed if the status is resolved',
+          data: null
+        });
+      }
       const phoneNumber = ctx.request.body.contact_inbox.source_id 
       
       const closeChat = closeLiveChat(phoneNumber);
