@@ -13,8 +13,6 @@ module.exports = {
           data: null
         });
       }
-
-      console.log(ctx.request.body.contact_inbox.source_id);
       
       const phoneNumber = ctx.request.body.contact_inbox.source_id 
       
