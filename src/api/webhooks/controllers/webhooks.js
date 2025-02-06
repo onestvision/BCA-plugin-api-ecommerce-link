@@ -13,9 +13,12 @@ module.exports = {
           data: null
         });
       }
+
+      console.log(ctx.request.body.contact_inbox.source_id);
+      
       const phoneNumber = ctx.request.body.contact_inbox.source_id 
       
-      const closeChat = closeLiveChat(phoneNumber);
+      const closeChat = await closeLiveChat(phoneNumber);
   
       ctx.send({
         message: 'LiveChat closed correctly',

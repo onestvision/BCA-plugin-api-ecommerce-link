@@ -1,27 +1,37 @@
 const axios = require("axios");
 
 async function closeLiveChat(phone_number) {
-  const urlBase = process.env.ORCHESTADOR_URL
-  const onest_business_id = process.env.ORCHESTADOR_ONEST_BUSINESS_ID
-  const business_id = process.env.ORCHESTADOR_BUSINESS_ID
-  const phone_id = process.env.ORCHESTADOR_PHONE_ID
-  const webhook_id = process.env.ORCHESTADOR_WEBHOOK_ID
-  const url = `${urlBase}/api/${onest_business_id}/business/${business_id}/phone/${phone_id}/user/${phone_number}`
+  const {
+    ORCHESTADOR_URL: urlBase,
+    ORCHESTADOR_ONEST_BUSINESS_ID: onest_business_id,
+    ORCHESTADOR_BUSINESS_ID: business_id,
+    ORCHESTADOR_PHONE_ID: phone_id,
+    ORCHESTADOR_WEBHOOK_ID: webhook_id,
+  } = process.env;
+
+  if (!urlBase || !onest_business_id || !business_id || !phone_id || !webhook_id) {
+    throw new Error("Missing required environment variables");
+  }
+
+  const url = `${urlBase}/api/${onest_business_id}/business/${business_id}/phone/${phone_id}/user/${phone_number}`;
+
   try {
-    const body = {
-      "webhook_id": webhook_id
+    const response = await axios.put(
+      url,
+      { webhook_id },
+      { headers: { Authorization: "Bearer xeletiene" } }
+    );
+    console.log(response);
+    
+
+    if (!response.data?.status) {
+      throw new Error(`Error closing livechat: ${response.data?.message || "Unknown error"}`);
     }
-    const response = await axios.put(url, body,{
-      headers:{
-        Authorization: "Bearer xeletiene"
-      }
-    })
-    if (!response.data.status) {
-      throw new Error(`Error closing livechat: ${response.data.error}`);
-    }
-    return response
+
+    return response.data;
   } catch (error) {
-    throw new Error(`Error closing livechat: ${error.message}`);
+    const errorMessage = error.response?.data?.message || error.message;
+    throw new Error(`Error closing livechat: ${errorMessage}`);
   }
 }
 module.exports = { closeLiveChat };
