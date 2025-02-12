@@ -1,5 +1,5 @@
 'use strict';
-const { redirectToWoocomerce } = require("../services/redirect-to-woocomerce.js");
+const redirectToWoocomerce  = require("../services/redirect-to-woocomerce.js");
 
 /**
  * transaction controller
@@ -14,15 +14,16 @@ module.exports = createCoreController('api::transaction.transaction', ({ strapi 
       if (event == "transaction.updated") {
         if (data.transaction.redirect_url.startsWith("https://api.whatsapp.com")) {
           console.log("redirecting to Ecomchat")
-          //return await strapi.service('api::transaction.transaction').processPayment(data);
+          return await strapi.service('api::transaction.transaction').processPayment(data);
         } else if (data.transaction.redirect_url.startsWith("https://xeletiene.com")) {
           console.log("redirecting to Woocommerce")
-          //return await redirectToWoocomerce(ctx.request.body);
+          return await redirectToWoocomerce(ctx.request.body);
         }
-      }
+      }      
       return ctx.badRequest()
     } catch (error) {
       console.error(error);
+      return ctx.internalServerError("An error occurred while processing the payment");
     }
   },
   async cashOnDelivery(ctx) {
