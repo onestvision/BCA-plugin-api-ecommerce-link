@@ -8,7 +8,6 @@ const { updateTransaction } = require('../../../utils/kasoft/updateTransaction')
 const { sendWhatsAppInteractive } = require('../../../utils/messageSender/sendInteractive');
 const { sendWhatsAppMessage } = require("../../../utils/messageSender/sendMessage");
 const { sendWhatsAppSimpleTemplate } = require('../../../utils/messageSender/sendTemplate');
-const { generateDistpatch } = require('../../../utils/tracking/generateDispatch');
 const { generateLabel } = require('../../../utils/tracking/generateLabel');
 const { getTrackingCode } = require('../../../utils/tracking/getTrackingCode');
 
