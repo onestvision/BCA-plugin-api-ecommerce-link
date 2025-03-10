@@ -1,18 +1,14 @@
 'use strict';
 
-/**
- * encoder router
- */
-
 module.exports = {
   routes: [
     {
       method: 'POST',
-      path: '/webhook/close-live-chat',
-      handler: 'webhooks.closeChat',
+      path: '/webhooks/switch-chat/:origin',
+      handler: 'webhooks.switchChats',
       config: {
+        auth: false,
         policies: [],
-        middlewares: [],
       },
     },
   ],
