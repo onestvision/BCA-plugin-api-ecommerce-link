@@ -21,7 +21,6 @@ async function closeLiveChat(phone_number) {
       { webhook_id },
       { headers: { Authorization: "Bearer xeletiene" } }
     );
-    console.log(response);
     
 
     if (!response.data?.status) {

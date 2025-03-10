@@ -13,10 +13,10 @@ module.exports = createCoreController('api::transaction.transaction', ({ strapi 
     try {
       if (event == "transaction.updated") {
         if (data.transaction.redirect_url.startsWith("https://api.whatsapp.com")) {
-          console.log("redirecting to Ecomchat")
+          console.info("redirecting to Ecomchat")
           return await strapi.service('api::transaction.transaction').processPayment(data);
         } else if (data.transaction.redirect_url.startsWith("https://xeletiene.com")) {
-          console.log("redirecting to Woocommerce")
+          console.info("redirecting to Woocommerce")
           return await redirectToWoocomerce(ctx.request.body);
         }
       }      

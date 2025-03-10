@@ -8,8 +8,6 @@ module.exports = async function redirectToWoocomerce(body) {
     throw new Error("Missing WooCommerce checkout URL.");
   }
 
-  console.log("Checkout URL:", checkout_url);
-
   try {
     const response = await axios.post(checkout_url, body);
     return response.data;
